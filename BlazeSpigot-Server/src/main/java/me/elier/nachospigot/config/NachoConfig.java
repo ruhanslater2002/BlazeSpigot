@@ -74,7 +74,7 @@ public class NachoConfig {
         set("world-settings.default.explosions.constant-radius", nachoJson.constantExplosions);
         set("settings.event.fire-entity-explode-event", nachoJson.fireEntityExplodeEvent);
         set("world-settings.default.explosions.reduced-density-rays", nachoJson.reducedDensityRays);
-        set("settings.brand-name", nachoJson.serverBrandName);
+//        set("settings.brand-name", nachoJson.serverBrandName);
         set("settings.stop-decoding-itemstack-on-place", nachoJson.stopDecodingItemStackOnPlace);
         set("settings.anti-crash", nachoJson.enableAntiCrash);
         set("world-settings.default.infinite-water-sources", nachoJson.infiniteWaterSources);
@@ -115,7 +115,7 @@ public class NachoConfig {
         c.addComment("settings.event.fire-entity-explode-event", "Toggles the entity explode event");
         c.addComment("settings.event.fire-player-move-event", "Toggles the player move event");
         c.addComment("settings.event.fire-leaf-decay-event", "Toggles the leaf decay event");
-        c.addComment("settings.brand-name", "Changes the brand name of the server.\nThis will show in statistics, server lists, client crashes,\n and in the client debug screen. (accessed by pressing F3)");
+//        c.addComment("settings.brand-name", "Changes the brand name of the server.\nThis will show in statistics, server lists, client crashes,\n and in the client debug screen. (accessed by pressing F3)");
         c.addComment("settings.stop-decoding-itemstack-on-place", "Disables decoding itemstacks when not needed");
         c.addComment("settings.anti-crash", "Kicks players if they try to do an action that would/might crash the server");
         c.addComment("settings.chunk.threads", "The amount of threads used for chunks");
