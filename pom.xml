@@ -8,7 +8,7 @@
         <version>7</version>
     </parent>
 
-    <groupId>dev.cobblesword.nachospigot</groupId>
+    <groupId>dev.ruhan.blazespigot</groupId>
     <artifactId>parent</artifactId>
     <version>dev-SNAPSHOT</version>
     <packaging>pom</packaging>
