@@ -309,50 +309,50 @@ public class VersionCommand extends BukkitCommand {
 //    }
 
     private static final String BRANCH = "master";
-    private static int getFromRepo(String repo, String hash) {
-        try {
-            /*
-            BufferedReader reader = Resources.asCharSource(
-                    new URL("https://ci.destroystokyo.com/job/PaperSpigot/lastSuccessfulBuild/buildNumber"), // PaperSpigot
-                    Charsets.UTF_8
-            ).openBufferedStream();
-            try {
-                // PaperSpigot start
-                int newVer = Integer.decode(reader.readLine());
-                int currentVer = Integer.decode(currentVerInt);
-                return newVer - currentVer;
-            } catch (NumberFormatException ex) {
-                //ex.printStackTrace();
-                // PaperSpigot end
-                return -1;
-            } finally {
-                reader.close();
-            }
-            */
-            HttpURLConnection connection = (HttpURLConnection) new URL("https://api.github.com/repos/" + repo + "/compare/" + BRANCH + "..." + hash).openConnection();
-            connection.connect();
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) return -2; // Unknown commit
-            try (
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8))
-            ) {
-                JSONObject obj = (JSONObject) new JSONParser().parse(reader);
-                String status = (String) obj.get("status");
-                switch (status) {
-                    case "identical":
-                        return 0;
-                    case "behind":
-                        return ((Number) obj.get("behind_by")).intValue();
-                    default:
-                        return -2;
-                }
-            } catch (ParseException | NumberFormatException e) {
-                e.printStackTrace();
-                return -1;
-            }
-            // TacoSpigot end
-        } catch (IOException e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
+//    private static int getFromRepo(String repo, String hash) {
+//        try {
+//            /*
+//            BufferedReader reader = Resources.asCharSource(
+//                    new URL("https://ci.destroystokyo.com/job/PaperSpigot/lastSuccessfulBuild/buildNumber"), // PaperSpigot
+//                    Charsets.UTF_8
+//            ).openBufferedStream();
+//            try {
+//                // PaperSpigot start
+//                int newVer = Integer.decode(reader.readLine());
+//                int currentVer = Integer.decode(currentVerInt);
+//                return newVer - currentVer;
+//            } catch (NumberFormatException ex) {
+//                //ex.printStackTrace();
+//                // PaperSpigot end
+//                return -1;
+//            } finally {
+//                reader.close();
+//            }
+//            */
+//            HttpURLConnection connection = (HttpURLConnection) new URL("https://api.github.com/repos/" + repo + "/compare/" + BRANCH + "..." + hash).openConnection();
+//            connection.connect();
+//            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) return -2; // Unknown commit
+//            try (
+//                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8))
+//            ) {
+//                JSONObject obj = (JSONObject) new JSONParser().parse(reader);
+//                String status = (String) obj.get("status");
+//                switch (status) {
+//                    case "identical":
+//                        return 0;
+//                    case "behind":
+//                        return ((Number) obj.get("behind_by")).intValue();
+//                    default:
+//                        return -2;
+//                }
+//            } catch (ParseException | NumberFormatException e) {
+//                e.printStackTrace();
+//                return -1;
+//            }
+//            // TacoSpigot end
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return -1;
+//        }
+//    }
 }
