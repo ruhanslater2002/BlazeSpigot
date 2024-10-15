@@ -170,14 +170,18 @@ public class VersionCommand extends BukkitCommand {
                 lastCheck = System.currentTimeMillis();
                 hasVersion = false;
             } else {
+                sender.sendMessage(" ");
                 sender.sendMessage(versionMessage);
+                sender.sendMessage(" ");
                 return;
             }
         }
         versionLock.lock();
         try {
             if (hasVersion) {
+                sender.sendMessage(" ");
                 sender.sendMessage(versionMessage);
+                sender.sendMessage(" ");
                 return;
             }
             versionWaiters.add(sender);
@@ -287,7 +291,7 @@ public class VersionCommand extends BukkitCommand {
     private void setVersionMessage(final @NotNull String msg) {
         lastCheck = System.currentTimeMillis();
 //        this.versionMessage = "This server is running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " (Implementing API version " + Bukkit.getBukkitVersion() + ")\n"+msg;
-        this.versionMessage = ChatColor.RED + "This server is running " + ChatColor.DARK_RED + Bukkit.getName() + ChatColor.RED + " version " + ChatColor.GRAY + ChatColor.ITALIC + "(" + Bukkit.getVersion() + ")\n"+msg;
+        this.versionMessage = ChatColor.DARK_GRAY + " ▶ " + ChatColor.RED + "This server is running " + ChatColor.DARK_RED + Bukkit.getName() + ChatColor.RED + " version " + ChatColor.GRAY + ChatColor.ITALIC + "(" + Bukkit.getVersion() + ")\n"+msg;
         // Paper end
         versionLock.lock();
         try {
