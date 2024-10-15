@@ -1,7 +1,7 @@
 package org.bukkit.command.defaults;
 
 import com.destroystokyo.paper.util.VersionFetcher; // Paper - version supplier
-import com.google.common.base.Charsets;
+//import com.google.common.base.Charsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -308,7 +308,7 @@ public class VersionCommand extends BukkitCommand {
 //        return getFromRepo(repo, currentVerInt);
 //    }
 
-    private static final String BRANCH = "master";
+//    private static final String BRANCH = "master";
 //    private static int getFromRepo(String repo, String hash) {
 //        try {
 //            /*
