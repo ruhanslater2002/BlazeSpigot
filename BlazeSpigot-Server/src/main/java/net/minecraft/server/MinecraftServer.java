@@ -44,6 +44,7 @@ import org.apache.logging.log4j.Logger;
 import jline.console.ConsoleReader;
 import joptsimple.OptionSet;
 
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.Main;
 import co.aikar.timings.SpigotTimings; // Spigot
 import xyz.sculas.nacho.async.AsyncExplosions;
@@ -1116,9 +1117,9 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
 
     }
 
-//    public String getServerModName() {
-//        return NachoConfig.serverBrandName; // [Nacho-0035] // NachoSpigot - NachoSpigot >  // TacoSpigot - TacoSpigot // PaperSpigot - PaperSpigot > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
-//    }
+    public String getServerModName() {
+        return Bukkit.getName(); // [Nacho-0035] // NachoSpigot - NachoSpigot >  // TacoSpigot - TacoSpigot // PaperSpigot - PaperSpigot > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
+    }
 
     public CrashReport b(CrashReport crashreport) {
         crashreport.g().a("Profiler Position", new Callable() {
@@ -1355,7 +1356,7 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
 
     public void b(MojangStatisticsGenerator mojangstatisticsgenerator) {
         mojangstatisticsgenerator.b("singleplayer", this.T());
-//        mojangstatisticsgenerator.b("server_brand", this.getServerModName());
+        mojangstatisticsgenerator.b("server_brand", this.getServerModName());
         mojangstatisticsgenerator.b("gui_supported", GraphicsEnvironment.isHeadless() ? "headless" : "supported");
         mojangstatisticsgenerator.b("dedicated", this.ae());
     }
