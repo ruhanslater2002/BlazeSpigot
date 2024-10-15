@@ -182,7 +182,7 @@
 
     <!-- This builds a completely 'ready to start' jar with all dependencies inside -->
     <build>
-        <finalName>NachoSpigot-Server</finalName>
+        <finalName>BlazeSpigot-Server</finalName>
         <defaultGoal>install</defaultGoal>
         <resources>
             <resource>
