@@ -286,7 +286,8 @@ public class VersionCommand extends BukkitCommand {
     // Paper start
     private void setVersionMessage(final @NotNull String msg) {
         lastCheck = System.currentTimeMillis();
-        this.versionMessage = "This server is running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " (Implementing API version " + Bukkit.getBukkitVersion() + ")\n"+msg;
+//        this.versionMessage = "This server is running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " (Implementing API version " + Bukkit.getBukkitVersion() + ")\n"+msg;
+        this.versionMessage = ChatColor.RED + "This server is running " + ChatColor.DARK_RED + Bukkit.getName() + ChatColor.RED + " version (" + Bukkit.getVersion() + ")\n"+msg;
         // Paper end
         versionLock.lock();
         try {
