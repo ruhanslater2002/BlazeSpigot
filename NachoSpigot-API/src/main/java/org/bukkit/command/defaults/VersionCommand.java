@@ -302,11 +302,11 @@ public class VersionCommand extends BukkitCommand {
         }
     }
 
-    private static int getDistance(String repo, String currentVerInt) { // PaperSpigot
-        // TacoSpigot start
-        currentVerInt = currentVerInt.replace("\"", "");
-        return getFromRepo(repo, currentVerInt);
-    }
+//    private static int getDistance(String repo, String currentVerInt) { // PaperSpigot
+//        // TacoSpigot start
+//        currentVerInt = currentVerInt.replace("\"", "");
+//        return getFromRepo(repo, currentVerInt);
+//    }
 
     private static final String BRANCH = "master";
     private static int getFromRepo(String repo, String hash) {
