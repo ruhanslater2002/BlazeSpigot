@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
 
     <name>BlazeSpigot-Parent</name>
-    <description>Parent project for all NachoSpigot modules.</description>
+    <description>Parent project for all BlazeSpigot modules.</description>
 
     <modules>
         <module>BlazeSpigot-Server</module>
