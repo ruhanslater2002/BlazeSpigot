@@ -15,21 +15,21 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.util.StringUtil;
 
 import com.google.common.collect.ImmutableList;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.net.URL;
+//import java.io.BufferedReader;
+//import java.io.IOException;
+//import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+//import org.json.simple.JSONObject;
+//import org.json.simple.parser.JSONParser;
+//import org.json.simple.parser.ParseException;
 
 // TacoSpigot start
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+//import java.io.InputStreamReader;
+//import java.net.HttpURLConnection;
 // TacoSpigot end
 
 public class VersionCommand extends BukkitCommand {
