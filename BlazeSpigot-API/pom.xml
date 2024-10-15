@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>dev.cobblesword.nachospigot</groupId>
+        <groupId>dev.ruhan.blazespigot</groupId>
         <artifactId>parent</artifactId>
         <version>dev-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
