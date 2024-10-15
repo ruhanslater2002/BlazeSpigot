@@ -298,7 +298,9 @@ public class VersionCommand extends BukkitCommand {
             hasVersion = true;
             versionTaskStarted = false;
             for (CommandSender sender : versionWaiters) {
+                sender.sendMessage(" ");
                 sender.sendMessage(versionMessage);
+                sender.sendMessage(" ");
             }
             versionWaiters.clear();
         } finally {
