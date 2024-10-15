@@ -265,9 +265,9 @@ public class NachoConfig {
 
     public static String serverBrandName;
 
-    private static void serverBrandName() {
-        serverBrandName = getString("settings.brand-name", "NachoSpigot");
-    }
+//    private static void serverBrandName() {
+//        serverBrandName = getString("settings.brand-name", "NachoSpigot");
+//    }
 
     public static boolean stopDecodingItemStackOnPlace;
 
