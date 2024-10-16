@@ -29,8 +29,7 @@ public class VersionCommand extends BukkitCommand {
 
 		if (args.length == 0) {
 			sender.sendMessage(" ");
-			sender.sendMessage(ChatColor.RED + "Running " + ChatColor.DARK_RED + ChatColor.BOLD + Bukkit.getName());
-			sender.sendMessage(ChatColor.DARK_GRAY + " ▶ " + ChatColor.GRAY + " Version " + "(" + ChatColor.RED + Bukkit.getVersion() + ChatColor.GRAY + ") By " + ChatColor.RED + "Glaoi");
+			sender.sendMessage(ChatColor.DARK_GRAY + " ▶ " + ChatColor.RED + "Running " + ChatColor.DARK_RED + ChatColor.BOLD + Bukkit.getName() + " (" + ChatColor.RED + Bukkit.getVersion() + ")");
 			sender.sendMessage(" ");
 		} else {
 			StringBuilder name = new StringBuilder();
