@@ -69,22 +69,23 @@ public class VersionCommand extends BukkitCommand {
 
 	private void describeToSender(Plugin plugin, CommandSender sender) {
 		PluginDescriptionFile desc = plugin.getDescription();
-		sender.sendMessage(
-				ChatColor.GREEN + desc.getName() + ChatColor.WHITE + " version " + ChatColor.GREEN + desc.getVersion());
+		sender.sendMessage(ChatColor.GREEN + desc.getName() + ChatColor.WHITE + " version " + ChatColor.GREEN + desc.getVersion());
 
 		if (desc.getDescription() != null) {
-			sender.sendMessage(desc.getDescription());
+			sender.sendMessage(" ");
+			sender.sendMessage(ChatColor.GRAY + desc.getDescription());
+			sender.sendMessage(" ");
 		}
 
 		if (desc.getWebsite() != null) {
-			sender.sendMessage("Website: " + ChatColor.GREEN + desc.getWebsite());
+			sender.sendMessage(ChatColor.DARK_GRAY + " ▶ " + ChatColor.WHITE + "Website: " + ChatColor.GREEN + desc.getWebsite());
 		}
 
 		if (!desc.getAuthors().isEmpty()) {
 			if (desc.getAuthors().size() == 1) {
-				sender.sendMessage("Author: " + getAuthors(desc));
+				sender.sendMessage(ChatColor.DARK_GRAY + " ▶ " + ChatColor.WHITE + "Author: " + getAuthors(desc));
 			} else {
-				sender.sendMessage("Authors: " + getAuthors(desc));
+				sender.sendMessage(ChatColor.DARK_GRAY + " ▶ " + ChatColor.WHITE + "Authors: " + getAuthors(desc));
 			}
 		}
 	}
