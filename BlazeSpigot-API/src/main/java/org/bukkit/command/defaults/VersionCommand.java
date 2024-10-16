@@ -36,7 +36,8 @@ public class VersionCommand extends BukkitCommand {
 
 //    private final ReentrantLock versionLock = new ReentrantLock();
     private boolean hasVersion = false;
-    private String versionMessage = "\n" + ChatColor.DARK_GRAY + " ▶ " + ChatColor.RED + "This server is running " + ChatColor.DARK_RED + Bukkit.getName() + ChatColor.RED + " version " + ChatColor.GRAY + ChatColor.ITALIC + "(" + Bukkit.getVersion() + ")\n";
+//    private String versionMessage = "\n" + ChatColor.DARK_GRAY + " ▶ " + ChatColor.RED + "This server is running " + ChatColor.DARK_RED + Bukkit.getName() + ChatColor.RED + " version " + ChatColor.GRAY + ChatColor.ITALIC + "(" + Bukkit.getVersion() + ")\n";
+    private String versionMessage = "test";
 //    private final Set<CommandSender> versionWaiters = new HashSet<CommandSender>();
     private boolean versionTaskStarted = false;
     private long lastCheck = 0;
