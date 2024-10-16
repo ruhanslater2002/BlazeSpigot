@@ -69,7 +69,7 @@ public class VersionCommand extends BukkitCommand {
 
 	private void describeToSender(Plugin plugin, CommandSender sender) {
 		PluginDescriptionFile desc = plugin.getDescription();
-		sender.sendMessage(ChatColor.GREEN + desc.getName() + ChatColor.WHITE + " version " + ChatColor.GREEN + desc.getVersion());
+		sender.sendMessage(ChatColor.GREEN + desc.getName() + ChatColor.GRAY + " (" + desc.getVersion() + ")");
 
 		if (desc.getDescription() != null) {
 			sender.sendMessage(" ");
