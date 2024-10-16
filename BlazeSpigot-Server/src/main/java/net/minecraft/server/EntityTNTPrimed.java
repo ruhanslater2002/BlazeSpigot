@@ -210,6 +210,7 @@ public class EntityTNTPrimed extends Entity {
                 }
             }
         }
+
         // IonSpigot end
 
         return this.inWater;
