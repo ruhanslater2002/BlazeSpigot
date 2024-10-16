@@ -406,9 +406,7 @@ public final class CraftServer implements Server {
     }
 
     @Override
-    public String getName() {
-        return serverName;
-    }
+    public String getName() { return this.serverName; }
 
     @Override
     public String getVersion() {
