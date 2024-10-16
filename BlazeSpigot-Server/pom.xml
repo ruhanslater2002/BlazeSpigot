@@ -36,7 +36,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>dev.cobblesword.nachospigot</groupId>
+            <groupId>dev.ruhan.blazespigot</groupId>
             <artifactId>api</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
