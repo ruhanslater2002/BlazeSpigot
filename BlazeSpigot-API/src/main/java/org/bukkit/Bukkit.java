@@ -85,7 +85,7 @@ public final class Bukkit {
      * @return name of this server implementation
      */
     public static String getName() {
-        return server.getServerName();
+        return server.getName();
     }
 
     /**
