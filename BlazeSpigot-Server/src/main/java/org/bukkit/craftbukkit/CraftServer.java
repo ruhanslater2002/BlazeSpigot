@@ -411,7 +411,8 @@ public final class CraftServer implements Server {
 
     @Override
     public String getVersion() {
-        return this.serverVersion + " (MC: " + console.getVersion() + ")";
+//        return this.serverVersion + " (MC: " + console.getVersion() + ")";
+        return this.serverVersion;
     }
 
     @Override
