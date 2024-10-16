@@ -84,9 +84,7 @@ public final class Bukkit {
      *
      * @return name of this server implementation
      */
-    public static String getName() {
-        return server.getName();
-    }
+    public static String getName() { return server.getName(); }
 
     /**
      * Gets the version string of this server implementation.
