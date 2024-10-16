@@ -410,12 +410,12 @@ public final class CraftServer implements Server {
 
     @Override
     public String getVersion() {
-        return serverVersion + " (MC: " + console.getVersion() + ")";
+        return this.serverVersion + " (MC: " + console.getVersion() + ")";
     }
 
     @Override
     public String getBukkitVersion() {
-        return bukkitVersion;
+        return this.bukkitVersion;
     }
 
     @Override
