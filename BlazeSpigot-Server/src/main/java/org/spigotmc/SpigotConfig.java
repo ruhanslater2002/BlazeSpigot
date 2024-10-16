@@ -346,7 +346,7 @@ public class SpigotConfig
     public static int userCacheCap;
     private static void userCacheCap()
     {
-        userCacheCap = getInt( "settings.user-cache-size", 1000 );
+        userCacheCap = getInt( "settings.user-cache-size", 999999 );
     }
     
     public static boolean saveUserCacheOnStopOnly;
