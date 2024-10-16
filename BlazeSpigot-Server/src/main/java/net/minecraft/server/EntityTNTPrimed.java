@@ -52,6 +52,7 @@ public class EntityTNTPrimed extends Entity {
     }
 
     public void t_() {
+        this.setInvisible(true); // For FPS
         if (world.spigotConfig.maxTntTicksPerTick > -1 && world.spigotConfig.currentPrimedTnt++ > world.spigotConfig.maxTntTicksPerTick) { return; } // Spigot
         this.lastX = this.locX;
         this.lastY = this.locY;
