@@ -33,8 +33,17 @@ import org.jetbrains.annotations.NotNull;
 // TacoSpigot end
 
 public class VersionCommand extends BukkitCommand {
+
+    private final ReentrantLock versionLock = new ReentrantLock();
+    private boolean hasVersion = false;
+    private String versionMessage = "\n" + ChatColor.DARK_GRAY + " ▶ " + ChatColor.RED + "This server is running " + ChatColor.DARK_RED + Bukkit.getName() + ChatColor.RED + " version " + ChatColor.GRAY + ChatColor.ITALIC + "(" + Bukkit.getVersion() + ")\n";
+    private final Set<CommandSender> versionWaiters = new HashSet<CommandSender>();
+    private boolean versionTaskStarted = false;
+    private long lastCheck = 0;
+
     // Paper start
     private VersionFetcher versionFetcher;
+
     private VersionFetcher getVersionFetcher() { // lazy load because unsafe isn't available at command registration
         if (versionFetcher == null) {
             versionFetcher = Bukkit.getUnsafe().getVersionFetcher();
@@ -59,7 +68,8 @@ public class VersionCommand extends BukkitCommand {
 
         if (args.length == 0) {
             //sender.sendMessage("This server is running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " (Implementing API version " + Bukkit.getBukkitVersion() + ")"); // Paper - moved to setVersionMessage
-            sendVersion(sender);
+            sender.sendMessage(this.versionMessage);
+//            sendVersion(sender);
         } else {
             StringBuilder name = new StringBuilder();
 
@@ -157,150 +167,144 @@ public class VersionCommand extends BukkitCommand {
         return ImmutableList.of();
     }
 
-    private final ReentrantLock versionLock = new ReentrantLock();
-    private boolean hasVersion = false;
-    private String versionMessage;
-    private final Set<CommandSender> versionWaiters = new HashSet<CommandSender>();
-    private boolean versionTaskStarted = false;
-    private long lastCheck = 0;
 
-    private void sendVersion(CommandSender sender) {
-        if (hasVersion) {
-            if (System.currentTimeMillis() - lastCheck > getVersionFetcher().getCacheTime()) { // Paper - use version supplier
-                lastCheck = System.currentTimeMillis();
-                hasVersion = false;
-            } else {
-                sender.sendMessage(versionMessage);
-                return;
-            }
-        }
-        versionLock.lock();
-        try {
-            if (hasVersion) {
-                sender.sendMessage(versionMessage);
-                return;
-            }
-            versionWaiters.add(sender);
-            sender.sendMessage(ChatColor.ITALIC + "Checking version, please wait...");
-            if (!versionTaskStarted) {
-                versionTaskStarted = true;
-                new Thread(this::obtainVersion).start();
-            }
-        } finally {
-            versionLock.unlock();
-        }
-    }
+//    private void sendVersion(CommandSender sender) {
+//        if (hasVersion) {
+//            if (System.currentTimeMillis() - lastCheck > getVersionFetcher().getCacheTime()) { // Paper - use version supplier
+//                lastCheck = System.currentTimeMillis();
+//                hasVersion = false;
+//            } else {
+//                sender.sendMessage(versionMessage);
+//                return;
+//            }
+//        }
+//        versionLock.lock();
+//        try {
+//            if (hasVersion) {
+//                sender.sendMessage(versionMessage);
+//                return;
+//            }
+//            versionWaiters.add(sender);
+//            sender.sendMessage(ChatColor.ITALIC + "Checking version, please wait...");
+//            if (!versionTaskStarted) {
+//                versionTaskStarted = true;
+//                new Thread(this::obtainVersion).start();
+//            }
+//        } finally {
+//            versionLock.unlock();
+//        }
+//    }
 
-    private void obtainVersion() {
-        String version = Bukkit.getVersion();
-        // Paper start
-        if (version.startsWith("null")) { // running from ide?
-            setVersionMessage(ChatColor.YELLOW + "Unknown version, custom build?");
-            return;
-        }
-        setVersionMessage(getVersionFetcher().getVersionMessage(version));
-        /*
-        if (version == null) version = "Custom";
-        // TacoSpigot start
-        if (version.startsWith("git-NachoSpigot-")) {
-            String[] parts = version.substring("git-NachoSpigot-".length()).split("[-\\s]");
-            int distance = getDistance("CobbleSword/NachoSpigot", parts[0]);
-            switch (distance) {
-                case -1:
-                    setVersionMessage("Error obtaining version information");
-                    break;
-                case 0:
-                    setVersionMessage("You are running the latest version");
-                    break;
-                case -2:
-                    setVersionMessage("Unknown version");
-                    break;
-                default:
-                    setVersionMessage("You are " + distance + " version(s) behind");
-            }
-        /*if (version.startsWith("git-TacoSpigot-")) {
-            String[] parts = version.substring("git-Tacospigot-".length()).split("[-\\s]");
-            int distance = getDistance("TacoSpigot/TacoSpigot", parts[0]);
-            switch (distance) {
-                case -1:
-                    setVersionMessage("Error obtaining version information");
-                    break;
-                case 0:
-                    setVersionMessage("You are running the latest version");
-                    break;
-                case -2:
-                    setVersionMessage("Unknown version");
-                    break;
-                default:
-                    setVersionMessage("You are " + distance + " version(s) behind");
-            }
-            // remove checking for other forks
-        // PaperSpigot start
-        if (version.startsWith("git-PaperSpigot-")) {
-            String[] parts = version.substring("git-PaperSpigot-".length()).split("[-\\s]");
-            int paperSpigotVersions = getDistance("paperspigot", parts[0]);
-            if (paperSpigotVersions == -1) {
-                setVersionMessage("Error obtaining version information");
-            } else {
-                if (paperSpigotVersions == 0) {
-                    setVersionMessage("You are running the latest version");
-                } else {
-                    setVersionMessage("You are " + paperSpigotVersions + " version(s) behind");
-                }
-            }
-        } else if (version.startsWith("git-Spigot-")) {
-        // PaperSpigot end
-            String[] parts = version.substring("git-Spigot-".length()).split("-");
-            int cbVersions = getDistance("craftbukkit", parts[1].substring(0, parts[1].indexOf(' ')));
-            int spigotVersions = getDistance("spigot", parts[0]);
-            if (cbVersions == -1 || spigotVersions == -1) {
-                setVersionMessage("Error obtaining version information");
-            } else {
-                if (cbVersions == 0 && spigotVersions == 0) {
-                    setVersionMessage("You are running the latest version");
-                } else {
-                    setVersionMessage("You are " + (cbVersions + spigotVersions) + " version(s) behind");
-                }
-            }
-
-        } else if (version.startsWith("git-Bukkit-")) {
-            version = version.substring("git-Bukkit-".length());
-            int cbVersions = getDistance("craftbukkit", version.substring(0, version.indexOf(' ')));
-            if (cbVersions == -1) {
-                setVersionMessage("Error obtaining version information");
-            } else {
-                if (cbVersions == 0) {
-                    setVersionMessage("You are running the latest version");
-                } else {
-                    setVersionMessage("You are " + cbVersions + " version(s) behind");
-                }
-            }
-            // TacoSpigot end
-        } else {
-            setVersionMessage("Unknown version, custom build?");
-        }
-         */
-        // Paper end
-    }
+//    private void obtainVersion() {
+//        String version = Bukkit.getVersion();
+//        // Paper start
+//        if (version.startsWith("null")) { // running from ide?
+//            setVersionMessage(ChatColor.YELLOW + "Unknown version, custom build?");
+//            return;
+//        }
+//        setVersionMessage(getVersionFetcher().getVersionMessage(version));
+//        /*
+//        if (version == null) version = "Custom";
+//        // TacoSpigot start
+//        if (version.startsWith("git-NachoSpigot-")) {
+//            String[] parts = version.substring("git-NachoSpigot-".length()).split("[-\\s]");
+//            int distance = getDistance("CobbleSword/NachoSpigot", parts[0]);
+//            switch (distance) {
+//                case -1:
+//                    setVersionMessage("Error obtaining version information");
+//                    break;
+//                case 0:
+//                    setVersionMessage("You are running the latest version");
+//                    break;
+//                case -2:
+//                    setVersionMessage("Unknown version");
+//                    break;
+//                default:
+//                    setVersionMessage("You are " + distance + " version(s) behind");
+//            }
+//        /*if (version.startsWith("git-TacoSpigot-")) {
+//            String[] parts = version.substring("git-Tacospigot-".length()).split("[-\\s]");
+//            int distance = getDistance("TacoSpigot/TacoSpigot", parts[0]);
+//            switch (distance) {
+//                case -1:
+//                    setVersionMessage("Error obtaining version information");
+//                    break;
+//                case 0:
+//                    setVersionMessage("You are running the latest version");
+//                    break;
+//                case -2:
+//                    setVersionMessage("Unknown version");
+//                    break;
+//                default:
+//                    setVersionMessage("You are " + distance + " version(s) behind");
+//            }
+//            // remove checking for other forks
+//        // PaperSpigot start
+//        if (version.startsWith("git-PaperSpigot-")) {
+//            String[] parts = version.substring("git-PaperSpigot-".length()).split("[-\\s]");
+//            int paperSpigotVersions = getDistance("paperspigot", parts[0]);
+//            if (paperSpigotVersions == -1) {
+//                setVersionMessage("Error obtaining version information");
+//            } else {
+//                if (paperSpigotVersions == 0) {
+//                    setVersionMessage("You are running the latest version");
+//                } else {
+//                    setVersionMessage("You are " + paperSpigotVersions + " version(s) behind");
+//                }
+//            }
+//        } else if (version.startsWith("git-Spigot-")) {
+//        // PaperSpigot end
+//            String[] parts = version.substring("git-Spigot-".length()).split("-");
+//            int cbVersions = getDistance("craftbukkit", parts[1].substring(0, parts[1].indexOf(' ')));
+//            int spigotVersions = getDistance("spigot", parts[0]);
+//            if (cbVersions == -1 || spigotVersions == -1) {
+//                setVersionMessage("Error obtaining version information");
+//            } else {
+//                if (cbVersions == 0 && spigotVersions == 0) {
+//                    setVersionMessage("You are running the latest version");
+//                } else {
+//                    setVersionMessage("You are " + (cbVersions + spigotVersions) + " version(s) behind");
+//                }
+//            }
+//
+//        } else if (version.startsWith("git-Bukkit-")) {
+//            version = version.substring("git-Bukkit-".length());
+//            int cbVersions = getDistance("craftbukkit", version.substring(0, version.indexOf(' ')));
+//            if (cbVersions == -1) {
+//                setVersionMessage("Error obtaining version information");
+//            } else {
+//                if (cbVersions == 0) {
+//                    setVersionMessage("You are running the latest version");
+//                } else {
+//                    setVersionMessage("You are " + cbVersions + " version(s) behind");
+//                }
+//            }
+//            // TacoSpigot end
+//        } else {
+//            setVersionMessage("Unknown version, custom build?");
+//        }
+//         */
+//        // Paper end
+//    }
 
     // Paper start
-    private void setVersionMessage(final @NotNull String msg) {
-        lastCheck = System.currentTimeMillis();
-//        this.versionMessage = "This server is running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " (Implementing API version " + Bukkit.getBukkitVersion() + ")\n"+msg;
-        this.versionMessage = "\n" + ChatColor.DARK_GRAY + " ▶ " + ChatColor.RED + "This server is running " + ChatColor.DARK_RED + Bukkit.getName() + ChatColor.RED + " version " + ChatColor.GRAY + ChatColor.ITALIC + "(" + Bukkit.getVersion() + ")\n";
-        // Paper end
-        versionLock.lock();
-        try {
-            hasVersion = true;
-            versionTaskStarted = false;
-            for (CommandSender sender : versionWaiters) {
-                sender.sendMessage(versionMessage);
-            }
-            versionWaiters.clear();
-        } finally {
-            versionLock.unlock();
-        }
-    }
+//    private void setVersionMessage(final @NotNull String msg) {
+//        lastCheck = System.currentTimeMillis();
+////        this.versionMessage = "This server is running " + Bukkit.getName() + " version " + Bukkit.getVersion() + " (Implementing API version " + Bukkit.getBukkitVersion() + ")\n"+msg;
+//        this.versionMessage = "\n" + ChatColor.DARK_GRAY + " ▶ " + ChatColor.RED + "This server is running " + ChatColor.DARK_RED + Bukkit.getName() + ChatColor.RED + " version " + ChatColor.GRAY + ChatColor.ITALIC + "(" + Bukkit.getVersion() + ")\n"+msg;
+//        // Paper end
+//        versionLock.lock();
+//        try {
+//            hasVersion = true;
+//            versionTaskStarted = false;
+//            for (CommandSender sender : versionWaiters) {
+//                sender.sendMessage(versionMessage);
+//            }
+//            versionWaiters.clear();
+//        } finally {
+//            versionLock.unlock();
+//        }
+//    }
 
 //    private static int getDistance(String repo, String currentVerInt) { // PaperSpigot
 //        // TacoSpigot start
