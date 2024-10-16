@@ -159,7 +159,7 @@ public class VersionCommand extends BukkitCommand {
 
     private final ReentrantLock versionLock = new ReentrantLock();
     private boolean hasVersion = false;
-    private String versionMessage = null;
+    private String versionMessage;
     private final Set<CommandSender> versionWaiters = new HashSet<CommandSender>();
     private boolean versionTaskStarted = false;
     private long lastCheck = 0;
