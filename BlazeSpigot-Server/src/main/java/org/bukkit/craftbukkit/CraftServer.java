@@ -177,7 +177,8 @@ public final class CraftServer implements Server {
         this.console = console;
         this.playerList = (DedicatedPlayerList) playerList;
         this.playerView = Collections.unmodifiableList(Lists.transform(playerList.players, net.minecraft.server.EntityPlayer::getBukkitEntity));
-        this.serverVersion = CraftServer.class.getPackage().getImplementationVersion(); // FINAL
+//        this.serverVersion = CraftServer.class.getPackage().getImplementationVersion(); // FINAL
+        this.serverVersion = "1.0";
         online.value = console.getPropertyManager().getBoolean("online-mode", true);
 
         Bukkit.setServer(this);
