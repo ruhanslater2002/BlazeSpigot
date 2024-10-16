@@ -18,11 +18,11 @@ import com.google.common.collect.ImmutableList;
 //import java.io.BufferedReader;
 //import java.io.IOException;
 //import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
+//import java.util.HashSet;
+//import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.jetbrains.annotations.NotNull;
+//import org.jetbrains.annotations.NotNull;
 //import org.json.simple.JSONObject;
 //import org.json.simple.parser.JSONParser;
 //import org.json.simple.parser.ParseException;
@@ -34,10 +34,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class VersionCommand extends BukkitCommand {
 
-    private final ReentrantLock versionLock = new ReentrantLock();
+//    private final ReentrantLock versionLock = new ReentrantLock();
     private boolean hasVersion = false;
     private String versionMessage = "\n" + ChatColor.DARK_GRAY + " ▶ " + ChatColor.RED + "This server is running " + ChatColor.DARK_RED + Bukkit.getName() + ChatColor.RED + " version " + ChatColor.GRAY + ChatColor.ITALIC + "(" + Bukkit.getVersion() + ")\n";
-    private final Set<CommandSender> versionWaiters = new HashSet<CommandSender>();
+//    private final Set<CommandSender> versionWaiters = new HashSet<CommandSender>();
     private boolean versionTaskStarted = false;
     private long lastCheck = 0;
 
