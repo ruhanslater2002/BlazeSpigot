@@ -74,7 +74,7 @@ public class SpigotWorldConfig
     public boolean clearChunksOnTick;
     private void chunksPerTick()
     {
-        chunksPerTick = getInt( "chunks-per-tick", 650 );
+        chunksPerTick = getInt( "chunks-per-tick", 320 );
         log( "Chunks to Grow per Tick: " + chunksPerTick );
 
         clearChunksOnTick = getBoolean( "clear-tick-list", false );
