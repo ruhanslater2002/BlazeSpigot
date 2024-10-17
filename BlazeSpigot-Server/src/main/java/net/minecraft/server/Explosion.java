@@ -20,6 +20,8 @@ import xyz.sculas.nacho.async.AsyncExplosions;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+
+
 public class Explosion {
 
     public static final Random CACHED_RANDOM = new Random();
