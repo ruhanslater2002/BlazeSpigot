@@ -39,119 +39,182 @@ public class Explosion {
     public boolean wasCanceled = false; // CraftBukkit - add field
 
     public Explosion(World world, Entity entity, double d0, double d1, double d2, float f, boolean flag, boolean flag1) {
+        // Assign the world in which the explosion occurs
         this.world = world;
+
+        // Assign the entity that caused the explosion (could be null if there's no source, like in the case of a natural explosion)
         this.source = entity;
+
+        // Set the explosion size, ensuring the value is clamped to be at least 0.0 to avoid invalid or negative sizes.
         this.size = (float) Math.max(f, 0.0); // CraftBukkit - clamp bad values
+
+        // Set the explosion's position (X, Y, Z) using the provided coordinates (d0, d1, d2).
         this.posX = d0;
         this.posY = d1;
         this.posZ = d2;
+
+        // Boolean flag indicating if the explosion causes fires (flag is true if the explosion can set blocks on fire).
         this.a = flag;
+
+        // Boolean flag indicating whether block damage should occur (flag1 is true if the explosion destroys blocks).
         this.b = flag1;
     }
 
+
     public void a() {
-        // CraftBukkit start
+        // CraftBukkit start: Early return if the explosion size is too small to have any impact.
         if (this.size < 0.1F) {
             return;
         }
         // CraftBukkit end
-        // HashSet<BlockPosition> hashset = Sets.newHashSet();
 
+        // Variables for chunk/block positions.
         int i;
         int j;
 
         // IonSpigot start - Block Searching Improvements
+        // Create a BlockPosition object using the current position of the explosion (posX, posY, posZ).
         BlockPosition pos = new BlockPosition(posX, posY, posZ);
-        Chunk chunk = world.getChunkAt(pos.getX() >> 4, pos.getZ() >> 4);
+
+        // Get the chunk where the explosion is happening.
+        Chunk chunk = world.getChunkAt(pos.getX() >> 4, pos.getZ() >> 4); // Dividing by 16 to get chunk coordinates.
+
+        // Get the block at the current explosion position.
         Block b = chunk.getBlockData(pos).getBlock(); // TacoSpigot - get block of the explosion
 
-        if (!this.world.tacoSpigotConfig.optimizeLiquidExplosions || !b.getMaterial().isLiquid()) { // TacoSpigot - skip calculating what blocks to blow up in water/lava
+        // Check if the world configuration allows skipping liquid explosions and if the block is liquid (e.g., water or lava).
+        if (!this.world.tacoSpigotConfig.optimizeLiquidExplosions || !b.getMaterial().isLiquid()) {
+            // Use a fastutil set to store block positions to be affected by the explosion.
             it.unimi.dsi.fastutil.longs.LongSet set = new it.unimi.dsi.fastutil.longs.LongOpenHashSet();
+
+            // Search for blocks in the current chunk that will be affected by the explosion.
             searchForBlocks(set, chunk);
+
+            // Iterate over the set of found blocks and add their positions to the explosion's block list.
             for (it.unimi.dsi.fastutil.longs.LongIterator iterator = set.iterator(); iterator.hasNext(); ) {
                 this.blocks.add(BlockPosition.fromLong(iterator.nextLong()));
             }
         }
 
-        // this.blocks.addAll(hashset);
+        // this.blocks.addAll(hashset);  // Old method of adding blocks (commented out)
+
+        // Calculate the explosion radius by multiplying the explosion size by 2.
         float f3 = this.size * 2.0F;
 
         // IonSpigot start - Faster Entity Iteration
-        i = MathHelper.floor(this.posX - (double) f3 - 1.0D) >> 4;
-        j = MathHelper.floor(this.posX + (double) f3 + 1.0D) >> 4;
-        int l = MathHelper.clamp(MathHelper.floor(this.posY - (double) f3 - 1.0D) >> 4, 0, 15);
-        int i1 = MathHelper.clamp(MathHelper.floor(this.posY + (double) f3 + 1.0D) >> 4, 0, 15);
-        int j1 = MathHelper.floor(this.posZ - (double) f3 - 1.0D) >> 4;
-        int k1 = MathHelper.floor(this.posZ + (double) f3 + 1.0D) >> 4;
+        // Calculate the chunk range affected by the explosion in the X, Y, and Z dimensions.
+        i = MathHelper.floor(this.posX - (double) f3 - 1.0D) >> 4;  // Start X chunk (left boundary)
+        j = MathHelper.floor(this.posX + (double) f3 + 1.0D) >> 4;  // End X chunk (right boundary)
+
+        // Clamp Y chunk range between 0 and 15 to avoid going out of the world’s Y range.
+        int l = MathHelper.clamp(MathHelper.floor(this.posY - (double) f3 - 1.0D) >> 4, 0, 15);  // Start Y chunk
+        int i1 = MathHelper.clamp(MathHelper.floor(this.posY + (double) f3 + 1.0D) >> 4, 0, 15);  // End Y chunk
+
+        int j1 = MathHelper.floor(this.posZ - (double) f3 - 1.0D) >> 4;  // Start Z chunk
+        int k1 = MathHelper.floor(this.posZ + (double) f3 + 1.0D) >> 4;  // End Z chunk
+
         // PaperSpigot start - Fix lag from explosions processing dead entities
+        // The code below was removed (commented out) to prevent checking entities that are dead or shouldn't be processed during explosions.
         // List<Entity> list = this.world.a(this.source, new AxisAlignedBB(i, l, j1, j, i1, k1), entity -> IEntitySelector.d.apply(entity) && !entity.dead);
         // PaperSpigot end
+
+        // Create a vector representing the center of the explosion.
         Vec3D vec3d = new Vec3D(this.posX, this.posY, this.posZ);
 
+        // Loop over all chunks in the X and Z range (horizontally) affected by the explosion.
         for (int chunkX = i; chunkX <= j; ++chunkX) {
             for (int chunkZ = j1; chunkZ <= k1; ++chunkZ) {
+                // Retrieve the chunk if it is already loaded. If not loaded, skip it to avoid loading unnecessary chunks.
                 chunk = world.getChunkIfLoaded(chunkX, chunkZ);
-
                 if (chunk == null) {
-                    continue;
+                    continue;  // Skip unloaded chunks.
                 }
 
+                // Loop through the Y chunk range (vertically) affected by the explosion.
                 for (int chunkY = l; chunkY <= i1; ++chunkY) {
+                    // Process and affect all entities in the current Y slice of the chunk.
                     affectEntities(chunk.entitySlices[chunkY], vec3d, f3);
                 }
             }
         }
     }
 
+
     public void affectEntities(List<Entity> list, Vec3D vec3d, float f3) {
+        // Iterate over the list of entities that may be affected by the explosion
         for (Entity entity : list) {
+            // Skip entities that are not interactive (e.g., non-living entities like items)
             if (!entity.aW()) {
+                // Check if the entity is not dead before processing
                 if (!entity.dead) {
-                    double d8 = entity.locX - this.posX;
-                    double d9 = entity.locY + entity.getHeadHeight() - this.posY;
-                    double d10 = entity.locZ - this.posZ;
+                    // Calculate the distance between the entity and the explosion in X, Y, and Z dimensions
+                    double d8 = entity.locX - this.posX;  // X-axis distance
+                    double d9 = entity.locY + entity.getHeadHeight() - this.posY;  // Y-axis distance (accounts for head height)
+                    double d10 = entity.locZ - this.posZ;  // Z-axis distance
+
+                    // Calculate the squared distance to avoid unnecessary square root operations for comparison
                     double distanceSquared = d8 * d8 + d9 * d9 + d10 * d10;
 
+                    // Check if the entity is within a certain range of the explosion (64.0D = 8 block radius) and ensure it's not exactly at the explosion center
                     if (distanceSquared <= 64.0D && distanceSquared != 0.0D) {
+                        // Calculate the actual distance to the entity by taking the square root of the squared distance
                         double d11 = MathHelper.sqrt(distanceSquared);
-                        double d7 = d11 / (double) f3;
-                        d8 /= d11;
-                        d9 /= d11;
-                        d10 /= d11;
 
-                        // Paper - Optimize explosions
-                        // double d12 = this.getBlockDensity(vec3d, entity);
-                        double finalD = d8;
-                        double finalD1 = d9;
-                        double finalD11 = d10;
+                        // Normalize the distance by dividing it by the explosion radius (f3)
+                        double d7 = d11 / (double) f3;
+
+                        // Normalize the direction vectors by dividing by the distance (d11)
+                        d8 /= d11;  // X direction
+                        d9 /= d11;  // Y direction
+                        d10 /= d11;  // Z direction
+
+                        // Paper optimization - Asynchronously calculate the block density (how much the explosion is shielded by blocks)
+                        double finalD = d8;  // Store normalized X direction for later use
+                        double finalD1 = d9;  // Store normalized Y direction for later use
+                        double finalD11 = d10;  // Store normalized Z direction for later use
+
+                        // Calculate block density around the entity's bounding box and handle it asynchronously
                         this.getBlockDensity(vec3d, entity.getBoundingBox()).thenAccept((d12) -> MCUtils.ensureMain(() -> {
+                            // d12 represents the amount of explosion force reaching the entity (0.0 = fully blocked, 1.0 = full force)
+
+                            // Calculate the explosion impact factor, scaled by the block density and distance from the explosion
                             double d13 = (1.0D - d7) * d12;
 
+                            // Special handling for cannoning entities to apply custom knockback (IonSpigot optimization)
                             if (entity.isCannoningEntity) {
-                                entity.g(finalD * d13, finalD1 * d13, finalD11 * d13);
-                                return;
+                                entity.g(finalD * d13, finalD1 * d13, finalD11 * d13);  // Apply explosion force directly to cannoning entity
+                                return;  // Skip further processing for cannoning entities
                             }
-                            // IonSpigot end
 
-                            // entity.damageEntity(DamageSource.explosion(this), (float) ((int) ((d13 * d13 + d13) / 2.0D * 8.0D * (double) f3 + 1.0D))); // CraftBukkit start
+                            // CraftBukkit start - Damage handling for the entity due to the explosion
+                            // Calculate the damage to the entity based on distance and force of the explosion
                             CraftEventFactory.entityDamage = source;
                             entity.forceExplosionKnockback = false;
+
+                            // Apply explosion damage to the entity
                             boolean wasDamaged = entity.damageEntity(DamageSource.explosion(this), (float) ((int) ((d13 * d13 + d13) / 2.0D * 8.0D * (double) f3 + 1.0D)));
+
+                            // Reset damage source after calculation
                             CraftEventFactory.entityDamage = null;
 
+                            // If the entity was not damaged, skip further processing (unless it's a TNT or falling block entity or has forced knockback)
                             if (!wasDamaged && !(entity instanceof EntityTNTPrimed || entity instanceof EntityFallingBlock) && !entity.forceExplosionKnockback) {
                                 return;
                             }
 
                             // CraftBukkit end
-                            double d14 = entity instanceof EntityHuman && world.paperSpigotConfig.disableExplosionKnockback ? 0 : EnchantmentProtection.a(entity, d13); // PaperSpigot
 
-                            // PaperSpigot start - Fix cannons
-                            // This impulse method sets the dirty flag, so clients will get an immediate velocity update
+                            // Calculate the amount of knockback, applying enchantment protection if applicable (PaperSpigot)
+                            double d14 = entity instanceof EntityHuman && world.paperSpigotConfig.disableExplosionKnockback ? 0 : EnchantmentProtection.a(entity, d13);
+
+                            // PaperSpigot start - Apply explosion knockback to the entity, updating client velocity instantly
                             entity.g(finalD * d14, finalD1 * d14, finalD11 * d14);
-                            // PaperSpigot end
 
-                            if (entity instanceof EntityHuman && !((EntityHuman) entity).abilities.isInvulnerable && !world.paperSpigotConfig.disableExplosionKnockback) { // PaperSpigot
+                            // PaperSpigot end - Fix cannons by updating entity velocities
+
+                            // Handle knockback specifically for human entities that are not invulnerable and if knockback is not disabled
+                            if (entity instanceof EntityHuman && !((EntityHuman) entity).abilities.isInvulnerable && !world.paperSpigotConfig.disableExplosionKnockback) {
+                                // Store the knockback vector for the player
                                 this.k.put((EntityHuman) entity, new Vec3D(finalD * d13, finalD1 * d13, finalD11 * d13));
                             }
                         }));
@@ -161,132 +224,132 @@ public class Explosion {
         }
     }
 
+
     public void a(boolean flag) {
-        // PaperSpigot start - Configurable TNT explosion volume.
+        // PaperSpigot start - Configurable TNT explosion volume based on source type.
         float volume = source instanceof EntityTNTPrimed ? world.paperSpigotConfig.tntExplosionVolume : 4.0F;
+        // Play explosion sound at the explosion's coordinates with specified volume and pitch variation.
         this.world.makeSound(this.posX, this.posY, this.posZ, "random.explode", volume, (1.0F + (this.world.random.nextFloat() - this.world.random.nextFloat()) * 0.2F) * 0.7F);
         // PaperSpigot end
+
+        // If explosion size is larger than or equal to 2.0 and flag b is true, spawn a huge explosion particle.
         if (this.size >= 2.0F && this.b) {
             this.world.addParticle(EnumParticle.EXPLOSION_HUGE, this.posX, this.posY, this.posZ, 1.0D, 0.0D, 0.0D, Constants.EMPTY_ARRAY);
         } else {
+            // Otherwise, spawn a large explosion particle.
             this.world.addParticle(EnumParticle.EXPLOSION_LARGE, this.posX, this.posY, this.posZ, 1.0D, 0.0D, 0.0D, Constants.EMPTY_ARRAY);
         }
 
         Iterator iterator;
         BlockPosition blockposition;
 
+        // If flag b is true, we will handle block and entity explosion events.
         if (this.b) {
-            // CraftBukkit start
-            org.bukkit.World bworld = this.world.getWorld();
-            org.bukkit.entity.Entity explode = this.source == null ? null : this.source.getBukkitEntity();
-            Location location = new Location(bworld, this.posX, this.posY, this.posZ);
+            // CraftBukkit start - Converting to Bukkit's explosion event system.
+            org.bukkit.World bworld = this.world.getWorld();  // Get Bukkit world reference.
+            org.bukkit.entity.Entity explode = this.source == null ? null : this.source.getBukkitEntity();  // Get the entity causing the explosion (if any).
+            Location location = new Location(bworld, this.posX, this.posY, this.posZ);  // Create a Bukkit location for explosion.
 
+            // Create a list to hold blocks that will be affected by the explosion.
             List<org.bukkit.block.Block> blockList = Lists.newArrayList();
+            // Iterate over all the blocks affected by the explosion and add them to the blockList.
             for (int i1 = this.blocks.size() - 1; i1 >= 0; i1--) {
                 BlockPosition cpos = this.blocks.get(i1);
                 org.bukkit.block.Block bblock = bworld.getBlockAt(cpos.getX(), cpos.getY(), cpos.getZ());
                 if (bblock.getType() != org.bukkit.Material.AIR) {
-                    blockList.add(bblock);
+                    blockList.add(bblock);  // Only add non-air blocks.
                 }
             }
 
-            boolean cancelled = false;
-            List<org.bukkit.block.Block> bukkitBlocks = blockList;
-            float yield = 0.3F; // default
+            // Default yield value (explosion strength, usually determines drop chances).
+            float yield = 0.3F;
+            boolean cancelled = false;  // Track whether the explosion event is cancelled.
 
+            // Handle explosion event based on whether an entity caused the explosion.
             if (explode != null) {
-                if (NachoConfig.fireEntityExplodeEvent) {
+                if (NachoConfig.fireEntityExplodeEvent) {  // If entity explosion event is enabled.
                     EntityExplodeEvent event = new EntityExplodeEvent(explode, location, blockList, yield);
-                    this.world.getServer().getPluginManager().callEvent(event);
-                    cancelled = event.isCancelled();
-                    bukkitBlocks = event.blockList();
-                    yield = event.getYield();
+                    this.world.getServer().getPluginManager().callEvent(event);  // Call the event.
+                    cancelled = event.isCancelled();  // Check if the event was cancelled.
+                    blockList = event.blockList();  // Get the updated block list.
+                    yield = event.getYield();  // Get the updated yield value.
                 }
             } else {
+                // Handle block explosion event (without an entity).
                 BlockExplodeEvent event = new BlockExplodeEvent(location.getBlock(), blockList, yield);
                 this.world.getServer().getPluginManager().callEvent(event);
                 cancelled = event.isCancelled();
-                bukkitBlocks = event.blockList();
+                blockList = event.blockList();
                 yield = event.getYield();
             }
 
+            // Clear the blocks list and repopulate it with the modified list from the event.
             this.blocks.clear();
-
-            for (org.bukkit.block.Block bblock : bukkitBlocks) {
+            for (org.bukkit.block.Block bblock : blockList) {
                 BlockPosition coords = new BlockPosition(bblock.getX(), bblock.getY(), bblock.getZ());
                 blocks.add(coords);
             }
 
+            // If the explosion was cancelled, stop further execution.
             if (cancelled) {
                 this.wasCanceled = true;
                 return;
             }
             // CraftBukkit end
-            iterator = this.blocks.iterator();
 
+            // Iterate through the list of affected blocks and process them.
+            iterator = this.blocks.iterator();
             while (iterator.hasNext()) {
                 blockposition = (BlockPosition) iterator.next();
                 Block block = this.world.getType(blockposition).getBlock();
 
-                world.spigotConfig.antiXrayInstance.updateNearbyBlocks(world, blockposition); // Spigot
-                // IonSpigot start - Optimise Explosions
+                // Spigot - Update nearby blocks for anti-xray system.
+                world.spigotConfig.antiXrayInstance.updateNearbyBlocks(world, blockposition);
+
+                // IonSpigot optimization (commented out) - previously this calculated explosion particles.
                 /*
                 if (flag) {
-                    double d0 = (float) blockposition.getX() + this.world.random.nextFloat();
-                    double d1 = (float) blockposition.getY() + this.world.random.nextFloat();
-                    double d2 = (float) blockposition.getZ() + this.world.random.nextFloat();
-                    double d3 = d0 - this.posX;
-                    double d4 = d1 - this.posY;
-                    double d5 = d2 - this.posZ;
-                    double d6 = MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
-
-                    d3 /= d6;
-                    d4 /= d6;
-                    d5 /= d6;
-                    double d7 = 0.5D / (d6 / (double) this.size + 0.1D);
-
-                    d7 *= this.world.random.nextFloat() * this.world.random.nextFloat() + 0.3F;
-                    d3 *= d7;
-                    d4 *= d7;
-                    d5 *= d7;
-                    this.world.addParticle(EnumParticle.EXPLOSION_NORMAL, (d0 + this.posX) / 2.0D, (d1 + this.posY) / 2.0D, (d2 + this.posZ) / 2.0D, d3, d4, d5);
-                    this.world.addParticle(EnumParticle.SMOKE_NORMAL, d0, d1, d2, d3, d4, d5);
+                    // Code to create visual particle effects for the explosion.
+                    // This calculates random offsets and directions for particle creation.
                 }
                 */
-                // IonSpigot end
 
+                // Check if the block is not air, and if so, process the explosion's impact on it.
                 if (block.getMaterial() != Material.AIR) {
+                    // If the block is affected by the explosion, drop it naturally based on the yield.
                     if (block.a(this)) {
-                        // CraftBukkit - add yield
                         block.dropNaturally(this.world, blockposition, this.world.getType(blockposition), yield, 0);
                     }
 
+                    // Set the block to air (destroy the block) and mark it as exploded.
                     this.world.setTypeAndData(blockposition, Blocks.AIR.getBlockData(), 3);
                     block.wasExploded(this.world, blockposition, this);
                 }
             }
         }
 
+        // If flag a is true, handle igniting blocks.
         if (this.a) {
             iterator = this.blocks.iterator();
 
+            // Iterate through the remaining blocks and set them on fire if certain conditions are met.
             while (iterator.hasNext()) {
                 blockposition = (BlockPosition) iterator.next();
-                // Nacho - revert >> // Nacho - optimize TNT by Lew_x
+                // Check if the block is air, and if the block below it is solid and randomly choose some to ignite.
                 if (this.world.getType(blockposition).getBlock().getMaterial() == Material.AIR && this.world.getType(blockposition.down()).getBlock().o() && this.c.nextInt(3) == 0) {
-                    // CraftBukkit start - Ignition by explosion
+
+                    // CraftBukkit - Call the block ignite event and only set fire if not cancelled.
                     if (!org.bukkit.craftbukkit.event.CraftEventFactory.callBlockIgniteEvent(this.world, blockposition.getX(), blockposition.getY(), blockposition.getZ(), this).isCancelled()) {
-                        this.world.setTypeUpdate(blockposition, Blocks.FIRE.getBlockData());
+                        this.world.setTypeUpdate(blockposition, Blocks.FIRE.getBlockData());  // Set the block on fire.
                     }
-                    // CraftBukkit end
                 }
             }
         }
-
     }
 
+
     public Map<EntityHuman, Vec3D> b() {
-        return this.k;
+        return this.k;  // Returns a map of human entities and their corresponding 3D vector positions.
     }
 
     public EntityLiving getSource() {
@@ -296,29 +359,35 @@ public class Explosion {
     }
 
     public void clearBlocks() {
-        this.blocks.clear();
+        this.blocks.clear();  // Clears the list of blocks that are affected by the explosion.
     }
 
     public List<BlockPosition> getBlocks() {
-        return this.blocks;
+        return this.blocks;  // Returns the list of blocks affected by the explosion.
     }
 
     // IonSpigot start - Block Searching Improvements
     private final static List<double[]> VECTORS = Lists.newArrayListWithCapacity(1352);
 
     static {
+        // Generate vectors for the edges of a 16x16x16 cube
         for (int k = 0; k < 16; ++k) {
             for (int i = 0; i < 16; ++i) {
                 for (int j = 0; j < 16; ++j) {
+                    // Only consider the outer edges of the cube
                     if (k == 0 || k == 15 || i == 0 || i == 15 || j == 0 || j == 15) {
+                        // Normalize the vector coordinates to range [-1, 1]
                         double d0 = (float) k / 15.0F * 2.0F - 1.0F;
                         double d1 = (float) i / 15.0F * 2.0F - 1.0F;
                         double d2 = (float) j / 15.0F * 2.0F - 1.0F;
+                        // Calculate the magnitude of the vector
                         double d3 = (NachoConfig.enableFastMath ? FastMath.sqrt(d0 * d0 + d1 * d1 + d2 * d2) : Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2));
 
+                        // Normalize the vector and scale it down
                         d0 = (d0 / d3) * 0.30000001192092896D;
                         d1 = (d1 / d3) * 0.30000001192092896D;
                         d2 = (d2 / d3) * 0.30000001192092896D;
+                        // Add the normalized vector to the list
                         VECTORS.add(new double[]{d0, d1, d2});
                     }
                 }
@@ -326,153 +395,178 @@ public class Explosion {
         }
     }
 
-    // https://github.com/jellysquid3/lithium-fabric/blob/1.16.x/dev/src/main/java/me/jellysquid/mods/lithium/mixin/world/explosions/ExplosionMixin.java
+    // Method to search for blocks affected by the explosion
     private void searchForBlocks(it.unimi.dsi.fastutil.longs.LongSet set, Chunk chunk) {
-        BlockPosition.MutableBlockPosition position = new BlockPosition.MutableBlockPosition();
+        BlockPosition.MutableBlockPosition position = new BlockPosition.MutableBlockPosition();  // Create a mutable block position for tracking
 
+        // Iterate through each pre-computed direction vector
         for (double[] vector : VECTORS) {
             double d0 = vector[0];
             double d1 = vector[1];
             double d2 = vector[2];
 
-            float f = this.size * (0.7F + (world.nachoSpigotConfig.constantExplosions ? 0.7F : this.world.random.nextFloat()) * 0.6F);
-            float resistance = 0;
+            float f = this.size * (0.7F + (world.nachoSpigotConfig.constantExplosions ? 0.7F : this.world.random.nextFloat()) * 0.6F); // Explosion radius
+            float resistance = 0;  // Initialize block resistance
 
+            // Starting point for the search
             double stepX = this.posX;
             double stepY = this.posY;
             double stepZ = this.posZ;
 
+            // Loop to determine how far the explosion can affect blocks
             for (; f > 0.0F; f -= 0.22500001F) {
+                // Get the block coordinates of the current step
                 int floorX = (NachoConfig.enableFastMath ? FastMath.floorToInt((Double.doubleToRawLongBits(stepX) >>> 63)) : org.bukkit.util.NumberConversions.floor(stepX));
                 int floorY = (NachoConfig.enableFastMath ? FastMath.floorToInt((Double.doubleToRawLongBits(stepY) >>> 63)) : org.bukkit.util.NumberConversions.floor(stepY));
                 int floorZ = (NachoConfig.enableFastMath ? FastMath.floorToInt((Double.doubleToRawLongBits(stepZ) >>> 63)) : org.bukkit.util.NumberConversions.floor(stepZ));
 
+                // Check if the position has changed
                 if (position.getX() != floorX || position.getY() != floorY || position.getZ() != floorZ) {
-                    position.setValues(floorX, floorY, floorZ);
+                    position.setValues(floorX, floorY, floorZ);  // Update the position
 
-                    int chunkX = floorX >> 4;
+                    int chunkX = floorX >> 4;  // Calculate chunk coordinates
                     int chunkZ = floorZ >> 4;
+
+                    // Load the chunk if necessary
                     if (chunk == null || !chunk.o() || chunk.locX != chunkX || chunk.locZ != chunkZ) {
                         chunk = world.getChunkAt(chunkX, chunkZ);
                     }
 
-                    IBlockData iblockdata = chunk.getBlockData(position);
-                    Block block = iblockdata.getBlock();
+                    IBlockData iblockdata = chunk.getBlockData(position);  // Get the block data at the current position
+                    Block block = iblockdata.getBlock();  // Get the block instance
 
+                    // If the block is not air
                     if (block != Blocks.AIR) {
-                        float blockResistance = block.durability / 5.0f;
-                        resistance = (blockResistance + 0.3F) * 0.3F;
-                        f -= resistance;
+                        float blockResistance = block.durability / 5.0f;  // Calculate block resistance
+                        resistance = (blockResistance + 0.3F) * 0.3F;  // Update resistance based on block properties
+                        f -= resistance;  // Decrease explosion power based on resistance
 
-                        if (f > 0.0F && (this.source == null || this.source.a(this, this.world, position, iblockdata, f)) && position.getY() < 256 && position.getY() >= 0) { // CraftBukkit - don't wrap explosions
-                            set.add(position.asLong());
+                        // Check if the explosion can affect this block
+                        if (f > 0.0F && (this.source == null || this.source.a(this, this.world, position, iblockdata, f)) && position.getY() < 256 && position.getY() >= 0) { // Ensure position is within valid world bounds
+                            set.add(position.asLong());  // Add position to the set of affected blocks
                         }
                     }
                 } else {
-                    f -= resistance;
+                    f -= resistance;  // If position is unchanged, just reduce explosion power by resistance
                 }
 
+                // Move to the next step in the direction of the vector
                 stepX += d0;
                 stepY += d1;
                 stepZ += d2;
             }
         }
     }
+
     // IonSpigot end
 
     // Paper start - Optimize explosions
+
     // Blaze Spigot - Start
     private CompletableFuture<Float> getBlockDensity(Vec3D explosionPos, AxisAlignedBB boundingBox) {
-        // Precompute the key once
+        // Precompute the key once for caching purposes
         final int cacheKey = createKey(this, boundingBox);
 
-        // Use supplyAsync to perform the task in the background without blocking
+        // Use supplyAsync to perform the task in the background without blocking the main thread
         return CompletableFuture.supplyAsync(() -> {
-            // Retrieve cached density if available
+            // Retrieve cached density if available, default to -1.0f if not cached
             Float cachedDensity = this.world.explosionDensityCache.getOrDefault(cacheKey, -1.0f);
 
-            // If cached value exists, return it immediately
+            // If cached value exists, return it immediately to save computation time
             if (cachedDensity != -1.0f) {
                 return cachedDensity;
             }
 
-            // Calculate density if not cached
+            // Calculate density if not found in the cache
             float newDensity = calculateDensity(explosionPos, boundingBox);
 
-            // Store the newly calculated density in the cache
+            // Store the newly calculated density in the cache for future reference
             this.world.explosionDensityCache.putIfAbsent(cacheKey, newDensity);
 
-            return newDensity;
-        }, AsyncExplosions.EXECUTOR);
+            return newDensity;  // Return the newly calculated density
+        }, AsyncExplosions.EXECUTOR);  // Run the task using a predefined executor for asynchronous execution
     }
     // Blaze Spigot - end
 
+    // Method to calculate the density based on whether reduced rays are enabled
     private float calculateDensity(Vec3D vec3d, AxisAlignedBB aabb) {
+        // Check the config to decide which density calculation method to use
         if (world.nachoSpigotConfig.reducedDensityRays) {
-            return calculateDensityReducedRays(vec3d, aabb);
+            return calculateDensityReducedRays(vec3d, aabb);  // Call method for reduced ray tracing
         } else {
-            return this.world.a(vec3d, aabb);
+            return this.world.a(vec3d, aabb);  // Default density calculation method
         }
     }
 
+    // Method to calculate density using reduced ray tracing
     private float calculateDensityReducedRays(Vec3D vec3d, AxisAlignedBB aabb) {
-        int arrived = 0;
-        int rays = 0;
+        int arrived = 0;  // Count of rays that hit a block
+        int rays = 0;     // Total number of rays cast
 
+        // Iterate through vectors calculated from the bounding box
         for (Vec3D vector : calculateVectors(aabb)) {
-            // If rays from the corners don't hit a block
-            // it should be safe to return the best outcome
+            // If rays from the corners don't hit a block, return maximum density
             if (rays == 8 && arrived == 8) {
-                return 1.0F;
+                return 1.0F;  // All rays arrived without hitting anything, return 1.0 for max density
             }
 
+            // Check if the ray from this vector to the explosion position hits a block
             if (world.rayTrace(vector, vec3d) == null) {
-                ++arrived;
+                ++arrived;  // Increment count of rays that arrived without hitting a block
             }
 
-            ++rays;
+            ++rays;  // Increment total ray count
         }
 
+        // Calculate density as the ratio of arrived rays to total rays
         return (float) arrived / (float) rays;
     }
 
+    // Method to calculate ray vectors from the given bounding box
     private List<Vec3D> calculateVectors(AxisAlignedBB aabb) {
+        // Calculate step sizes based on the dimensions of the bounding box
         double d0 = 1.0D / ((aabb.d - aabb.a) * 2.0D + 1.0D);
         double d1 = 1.0D / ((aabb.e - aabb.b) * 2.0D + 1.0D);
         double d2 = 1.0D / ((aabb.f - aabb.c) * 2.0D + 1.0D);
-        double d3 = (1.0D - ((NachoConfig.enableFastMath ? FastMath.floor(1.0D / d0) : Math.floor(1.0D / d0)) * d0)) / 2.0D;
-        double d4 = (1.0D - ((NachoConfig.enableFastMath ? FastMath.floor(1.0D / d2) : Math.floor(1.0D / d2)) * d2)) / 2.0D;
+        double d3 = (1.0D - ((NachoConfig.enableFastMath ? FastMath.floor(1.0D / d0) : Math.floor(1.0D / d0)) * d0)) / 2.0D; // Calculate offset for x-axis
+        double d4 = (1.0D - ((NachoConfig.enableFastMath ? FastMath.floor(1.0D / d2) : Math.floor(1.0D / d2)) * d2)) / 2.0D; // Calculate offset for z-axis
 
+        // Check for invalid dimensions
         if (d0 < 0.0 || d1 < 0.0 || d2 < 0.0) {
-            return Collections.emptyList();
+            return Collections.emptyList();  // Return an empty list if dimensions are invalid
         }
 
-        List<Vec3D> vectors = new LinkedList<>();
+        List<Vec3D> vectors = new LinkedList<>();  // List to hold calculated vectors
 
+        // Loop to create vectors within the bounding box
         for (float f = 0.0F; f <= 1.0F; f = (float) ((double) f + d0)) {
             for (float f1 = 0.0F; f1 <= 1.0F; f1 = (float) ((double) f1 + d1)) {
                 for (float f2 = 0.0F; f2 <= 1.0F; f2 = (float) ((double) f2 + d2)) {
-                    double d5 = aabb.a + (aabb.d - aabb.a) * (double) f;
-                    double d6 = aabb.b + (aabb.e - aabb.b) * (double) f1;
-                    double d7 = aabb.c + (aabb.f - aabb.c) * (double) f2;
-                    Vec3D vector = new Vec3D(d5 + d3, d6, d7 + d4);
+                    // Calculate the position of each vector based on the bounding box corners
+                    double d5 = aabb.a + (aabb.d - aabb.a) * (double) f;   // x coordinate
+                    double d6 = aabb.b + (aabb.e - aabb.b) * (double) f1; // y coordinate
+                    double d7 = aabb.c + (aabb.f - aabb.c) * (double) f2; // z coordinate
+                    Vec3D vector = new Vec3D(d5 + d3, d6, d7 + d4); // Create new vector with calculated offsets
 
+                    // Add the vector to the list; priority given to corner vectors
                     if ((f == 0 || f + d0 > 1.0F) && (f1 == 0 || f1 + d1 > 1.0F) && (f2 == 0 || f2 + d2 > 1.0F)) {
-                        vectors.add(0, vector);
+                        vectors.add(0, vector); // Add to the front of the list
                     } else {
-                        vectors.add(vector);
+                        vectors.add(vector); // Add to the end of the list
                     }
                 }
             }
         }
 
-        return vectors;
+        return vectors;  // Return the list of calculated vectors
     }
 
+    // Method to create a unique key for caching explosion density calculations
     static int createKey(Explosion explosion, AxisAlignedBB aabb) {
         int result;
         long temp;
-        result = explosion.world.hashCode();
+        result = explosion.world.hashCode(); // Start with the world's hash code
+        // Use double values to create a unique key based on position and bounding box dimensions
         temp = Double.doubleToLongBits(explosion.posX);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(explosion.posY);
@@ -491,52 +585,69 @@ public class Explosion {
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(aabb.f);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
-        return result;
+        return result; // Return the unique cache key
     }
-//    IonSpigot - comment this out
-    static class CacheKey {
-        private final World world;
-        private final double posX, posY, posZ;
-        private final double minX, minY, minZ;
-        private final double maxX, maxY, maxZ;
 
+    // IonSpigot - comment this out
+    static class CacheKey {
+        private final World world; // Reference to the world
+        private final double posX, posY, posZ; // Position coordinates of the explosion
+        private final double minX, minY, minZ; // Minimum coordinates of the bounding box
+        private final double maxX, maxY, maxZ; // Maximum coordinates of the bounding box
+
+        // Constructor to initialize the cache key based on explosion and bounding box
         public CacheKey(Explosion explosion, AxisAlignedBB aabb) {
-            this.world = explosion.world;
-            this.posX = explosion.posX;
-            this.posY = explosion.posY;
-            this.posZ = explosion.posZ;
-            this.minX = aabb.getMinX();
-            this.minY = aabb.getMinY();
-            this.minZ = aabb.getMinZ();
-            this.maxX = aabb.getMaxX();
-            this.maxY = aabb.getMaxY();
-            this.maxZ = aabb.getMaxZ();
+            this.world = explosion.world; // Set world from explosion
+            this.posX = explosion.posX;   // Set position x from explosion
+            this.posY = explosion.posY;   // Set position y from explosion
+            this.posZ = explosion.posZ;   // Set position z from explosion
+            this.minX = aabb.getMinX();   // Set min x from bounding box
+            this.minY = aabb.getMinY();   // Set min y from bounding box
+            this.minZ = aabb.getMinZ();   // Set min z from bounding box
+            this.maxX = aabb.getMaxX();   // Set max x from bounding box
+            this.maxY = aabb.getMaxY();   // Set max y from bounding box
+            this.maxZ = aabb.getMaxZ();   // Set max z from bounding box
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            // Check if the object is the same instance
+            if (this == o)
+                return true;
+            // Check if the object is null or not the same class
+            if (o == null || getClass() != o.getClass())
+                return false;
 
-            CacheKey cacheKey = (CacheKey) o;
+            CacheKey cacheKey = (CacheKey) o; // Cast the object to CacheKey
 
-            if (Double.compare(cacheKey.posX, posX) != 0) return false;
-            if (Double.compare(cacheKey.posY, posY) != 0) return false;
-            if (Double.compare(cacheKey.posZ, posZ) != 0) return false;
-            if (Double.compare(cacheKey.minX, minX) != 0) return false;
-            if (Double.compare(cacheKey.minY, minY) != 0) return false;
-            if (Double.compare(cacheKey.minZ, minZ) != 0) return false;
-            if (Double.compare(cacheKey.maxX, maxX) != 0) return false;
-            if (Double.compare(cacheKey.maxY, maxY) != 0) return false;
-            if (Double.compare(cacheKey.maxZ, maxZ) != 0) return false;
-            return world.equals(cacheKey.world);
+            // Compare all relevant fields for equality
+            if (Double.compare(cacheKey.posX, posX) != 0)
+                return false;
+            if (Double.compare(cacheKey.posY, posY) != 0)
+                return false;
+            if (Double.compare(cacheKey.posZ, posZ) != 0)
+                return false;
+            if (Double.compare(cacheKey.minX, minX) != 0)
+                return false;
+            if (Double.compare(cacheKey.minY, minY) != 0)
+                return false;
+            if (Double.compare(cacheKey.minZ, minZ) != 0)
+                return false;
+            if (Double.compare(cacheKey.maxX, maxX) != 0)
+                return false;
+            if (Double.compare(cacheKey.maxY, maxY) != 0)
+                return false;
+            if (Double.compare(cacheKey.maxZ, maxZ) != 0)
+                return false;
+            return world.equals(cacheKey.world); // Ensure world references are equal
         }
 
         @Override
         public int hashCode() {
-            int result;
-            long temp;
-            result = world.hashCode();
+            int result;  // Variable to hold the final hash code
+            long temp;   // Temporary variable for double to long conversion
+            result = world.hashCode(); // Start with the world's hash code
+            // Create unique hash based on position and bounding box dimensions
             temp = Double.doubleToLongBits(posX);
             result = 31 * result + (int) (temp ^ (temp >>> 32));
             temp = Double.doubleToLongBits(posY);
@@ -555,9 +666,9 @@ public class Explosion {
             result = 31 * result + (int) (temp ^ (temp >>> 32));
             temp = Double.doubleToLongBits(maxZ);
             result = 31 * result + (int) (temp ^ (temp >>> 32));
-            return result;
+            return result; // Return the final hash code
         }
     }
-    // IonSpigot end
-    // Paper end
 }
+    // Paper end
+    // IonSpigot end
