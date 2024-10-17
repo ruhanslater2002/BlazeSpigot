@@ -379,18 +379,31 @@ public class Explosion {
     // IonSpigot end
 
     // Paper start - Optimize explosions
-    private CompletableFuture<Float> getBlockDensity(Vec3D vec3d, AxisAlignedBB aabb) {
+    // Blaze Spigot - Start
+    private CompletableFuture<Float> getBlockDensity(Vec3D explosionPos, AxisAlignedBB boundingBox) {
+        // Precompute the key once
+        final int cacheKey = createKey(this, boundingBox);
+
+        // Use supplyAsync to perform the task in the background without blocking
         return CompletableFuture.supplyAsync(() -> {
-            // IonSpigot start - Optimise Density Cache
-            int key = createKey(this, aabb);
-            float blockDensity = this.world.explosionDensityCache.get(key);
-            if (blockDensity == -1.0f) {
-                blockDensity = calculateDensity(vec3d, aabb);
-                this.world.explosionDensityCache.put(key, blockDensity);
+            // Retrieve cached density if available
+            Float cachedDensity = this.world.explosionDensityCache.getOrDefault(cacheKey, -1.0f);
+
+            // If cached value exists, return it immediately
+            if (cachedDensity != -1.0f) {
+                return cachedDensity;
             }
-            return blockDensity;
+
+            // Calculate density if not cached
+            float newDensity = calculateDensity(explosionPos, boundingBox);
+
+            // Store the newly calculated density in the cache
+            this.world.explosionDensityCache.putIfAbsent(cacheKey, newDensity);
+
+            return newDensity;
         }, AsyncExplosions.EXECUTOR);
     }
+    // Blaze Spigot - end
 
     private float calculateDensity(Vec3D vec3d, AxisAlignedBB aabb) {
         if (world.nachoSpigotConfig.reducedDensityRays) {
