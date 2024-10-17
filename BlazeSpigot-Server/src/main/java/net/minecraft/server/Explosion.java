@@ -488,7 +488,7 @@ public class Explosion {
 
                     // If the block is not air
                     if (block != Blocks.AIR) {
-                        float blockResistance = block.durability / 5.0f;  // Calculate block resistance
+                        float blockResistance = block.durability / 5.0F;  // Calculate block resistance
                         resistance = (blockResistance + 0.3F) * 0.3F;  // Update resistance based on block properties
                         f -= resistance;  // Decrease explosion power based on resistance
 
