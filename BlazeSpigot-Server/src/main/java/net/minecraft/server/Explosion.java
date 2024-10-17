@@ -24,19 +24,70 @@ import java.util.concurrent.CompletableFuture;
 
 public class Explosion {
 
+    // A cached instance of Random to be used for generating random numbers.
+    // This is a static final field, meaning it is shared across all instances
+    // of this class and will not change once initialized.
     public static final Random CACHED_RANDOM = new Random();
+
+    // A boolean flag, `a`, whose purpose is likely to toggle some feature
+    // or behavior in the explosion logic. Its exact usage would depend
+    // on the broader context of the class.
     private final boolean a;
+
+    // Another boolean flag, `b`, similar to `a`, likely used for toggling
+    // a different feature or behavior in the explosion logic.
     private final boolean b;
+
+    // A Random instance, `c`, initialized to the shared CACHED_RANDOM instance.
+    // This allows for consistent random number generation across instances
+    // without creating a new Random object for each explosion.
     private final Random c = CACHED_RANDOM;
+
+    // A reference to the World object where the explosion occurs.
+    // This is crucial for interacting with the game world (e.g., getting
+    // block information, handling entities).
     private final World world;
+
+    // The x-coordinate of the explosion's position in the world.
+    // This is essential for determining the location of the explosion
+    // and its effects on surrounding blocks and entities.
     private final double posX;
+
+    // The y-coordinate of the explosion's position in the world.
+    // Similar to posX, this helps identify the explosion's exact location
+    // within the three-dimensional space of the game world.
     private final double posY;
+
+    // The z-coordinate of the explosion's position in the world.
+    // This, combined with posX and posY, specifies the precise position
+    // of the explosion in the world.
     private final double posZ;
+
+    // A reference to the entity that caused the explosion. This could be
+    // a player, a TNT block, or any other entity that can trigger explosions.
+    // It may be used to apply damage, grant rewards, or control the explosion's effects.
     public final Entity source;
+
+    // The size of the explosion, likely affecting its blast radius and damage.
+    // This float value helps determine how far the explosion's effects will reach.
     private final float size;
+
+    // A list of BlockPosition objects representing the blocks that are affected
+    // by the explosion. This allows for efficient tracking of which blocks
+    // should be destroyed or modified during the explosion process.
     private final List<BlockPosition> blocks = Lists.newArrayList();
+
+    // A map that associates EntityHuman (players) with Vec3D positions.
+    // This could be used to track the locations of players in relation to
+    // the explosion, potentially for applying damage or visual effects.
     private final Map<EntityHuman, Vec3D> k = Maps.newHashMap();
+
+    // A boolean flag indicating whether the explosion has been canceled.
+    // This is useful for scenarios where explosions may be prevented
+    // (e.g., by plugins or other game mechanics). If set to true,
+    // the explosion will not occur or will be aborted.
     public boolean wasCanceled = false; // CraftBukkit - add field
+
 
     public Explosion(World world, Entity entity, double d0, double d1, double d2, float f, boolean flag, boolean flag1) {
         // Assign the world in which the explosion occurs
