@@ -478,7 +478,7 @@ public class Explosion {
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
-    /* :: IonSpigot - comment this out
+//    IonSpigot - comment this out
     static class CacheKey {
         private final World world;
         private final double posX, posY, posZ;
@@ -543,7 +543,6 @@ public class Explosion {
             return result;
         }
     }
-    */
     // IonSpigot end
     // Paper end
 }
