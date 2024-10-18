@@ -203,7 +203,8 @@ class TimingsExport extends Thread {
             pair("bukkit", mapAsJSON(Bukkit.spigot().getBukkitConfig(), null)),
             pair("paper", mapAsJSON(Bukkit.spigot().getPaperSpigotConfig(), null)),
             pair("tacospigot", mapAsJSON(Bukkit.spigot().getTacoSpigotConfig(), null)),
-            pair("nachospigot", mapAsJSON(Bukkit.spigot().getNachoSpigotConfig(), null))
+            pair("nachospigot", mapAsJSON(Bukkit.spigot().getNachoSpigotConfig(), null)),
+            pair("blazespigot", mapAsJSON(Bukkit.spigot().getBlazeSpigotConfig(), null))
         ));
 
         new TimingsExport(sender, parent, history).start();

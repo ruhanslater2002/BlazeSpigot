@@ -1912,6 +1912,9 @@ public final class CraftServer implements Server {
         // Nacho end
 
         @Override
+        public YamlConfiguration getBlazeSpigotConfig() { return dev.ruhan.blazespigot.BlazeConfig.config; }
+
+        @Override
         public void restart() {
             org.spigotmc.RestartCommand.restart();
         }

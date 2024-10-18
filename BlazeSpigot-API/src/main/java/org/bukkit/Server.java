@@ -1044,7 +1044,12 @@ public interface Server extends PluginMessageRecipient {
             throw new UnsupportedOperationException("Not supported yet.");
         }
         // Nacho end
-
+        // Blaze start
+        public org.bukkit.configuration.file.YamlConfiguration getBlazeSpigotConfig()
+        {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+        // Blaze end
         /**
          * Sends the component to the player
          *
