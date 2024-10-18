@@ -236,7 +236,7 @@ public class PaperWorldConfig
     private void loadUnloaded()
     {
         loadUnloadedEnderPearls = getBoolean( "load-chunks.enderpearls", false );
-        loadUnloadedTNTEntities = getBoolean( "load-chunks.tnt-entities", false );
+        loadUnloadedTNTEntities = getBoolean( "load-chunks.tnt-entities", true );
         loadUnloadedFallingBlocks = getBoolean( "load-chunks.falling-blocks", false );
     }
 
