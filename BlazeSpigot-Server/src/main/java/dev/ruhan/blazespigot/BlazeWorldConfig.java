@@ -1,13 +1,10 @@
 package dev.ruhan.blazespigot;
 
-import com.destroystokyo.paper.PaperConfig;
-import com.destroystokyo.paper.PaperWorldConfig;
-import net.minecraft.server.World;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.IOException;
-import java.util.logging.Level;
+
+
 
 public class BlazeWorldConfig {
 
@@ -18,12 +15,10 @@ public class BlazeWorldConfig {
     public BlazeWorldConfig(String worldName) {
         this.worldName = worldName;
         this.config = BlazeConfig.config;
-        setExplosionSettings();
         this.init();
     }
 
-    public void init()
-    {
+    public void init() {
         this.verbose = getBoolean( "verbose", true );
 
         log( "-------- World Settings For [" + worldName + "] --------" );
@@ -53,15 +48,6 @@ public class BlazeWorldConfig {
         this.constantExplosions = this.getBoolean("explosions.constant-radius", false);
         this.explosionProtectedRegions = this.getBoolean("explosions.protected-regions", true);
         this.optimizeExplosions = this.getBoolean("explosions.optimizeExplosions", true);
-    }
-
-    // Optionally, add a save method to persist config changes
-    public void saveConfig() {
-        try {
-            config.save(BlazeConfig.CONFIG_FILE);
-        } catch (IOException ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "Could not save BlazeWorldConfig", ex);
-        }
     }
 
 }

@@ -12,6 +12,7 @@ import com.destroystokyo.paper.PaperConfig;
 import dev.cobblesword.nachospigot.Nacho;
 import dev.cobblesword.nachospigot.commons.IPUtils;
 import dev.cobblesword.nachospigot.knockback.KnockbackConfig;
+import dev.ruhan.blazespigot.BlazeConfig;
 import me.elier.nachospigot.config.NachoConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -175,10 +176,15 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
             if (this.getPort() < 0) { // Nacho - deobfuscate getPort
                 this.setPort(this.propertyManager.getInt("server-port", 25565));
             }
-            // Spigot start
-            NachoConfig.init((File) options.valueOf("nacho-settings")); // NachoSpigot - Load config before PlayerList
+            // BlazeSpigot start
+            BlazeConfig.init((File) options.valueOf("blaze-settings"));
+            // BlazeSpigot end
+            // Nacho start
             KnockbackConfig.init((File) options.valueOf("knockback-settings"));
             this.setPlayerList(new DedicatedPlayerList(this)); // Nacho - deobfuscate setPlayerList
+            Nacho.get().registerCommands(); // NachoSpigot :: Commands
+            NachoConfig.init((File) options.valueOf("nacho-settings")); // NachoSpigot - Load config before PlayerList
+            // Spigot start
             org.spigotmc.SpigotConfig.init((File) options.valueOf("spigot-settings"));
             org.spigotmc.SpigotConfig.registerCommands();
             // Spigot end
@@ -186,7 +192,6 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
             PaperConfig.init((File) options.valueOf("paper-settings"));
             PaperConfig.registerCommands();
             // PaperSpigot end
-            Nacho.get().registerCommands(); // NachoSpigot :: Commands
 
             DedicatedServer.LOGGER.info("Generating keypair");
             this.a(MinecraftEncryption.b());

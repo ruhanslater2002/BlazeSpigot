@@ -23,6 +23,7 @@ import javax.imageio.ImageIO;
 import com.eatthepath.uuid.FastUUID;
 import dev.cobblesword.nachospigot.Nacho;
 import dev.cobblesword.nachospigot.knockback.KnockbackConfig;
+import dev.ruhan.blazespigot.BlazeConfig;
 import me.elier.nachospigot.config.NachoConfig;
 import dev.cobblesword.nachospigot.commons.minecraft.PluginUtils;
 import xyz.sculas.nacho.malware.AntiMalware;
@@ -755,6 +756,8 @@ public final class CraftServer implements Server {
         net.techcable.tacospigot.TacoSpigotConfig.init((File) console.options.valueOf("taco-settings")); // TacoSpigot
         NachoConfig.init((File) console.options.valueOf("nacho-settings")); // NachoSpigot
         KnockbackConfig.init((File) console.options.valueOf("knockback-settings")); // NachoSpigot
+        BlazeConfig.init((File) console.options.valueOf("blaze-settings")); // BlazeSpigot
+
         for (WorldServer world : console.worlds) {
             world.worldData.setDifficulty(difficulty);
             world.setSpawnFlags(monsters, animals);
