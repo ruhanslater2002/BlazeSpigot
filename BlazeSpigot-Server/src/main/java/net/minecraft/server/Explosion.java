@@ -205,87 +205,78 @@ boolean flag1: This could represent whether the explosion should destroy blocks 
     }
 
 
-    public void affectEntities(List<Entity> list, Vec3D vec3d, float f3) {
-        // Iterate over the list of entities that may be affected by the explosion
-        for (Entity entity : list) {
-            // Skip entities that are not interactive (e.g., non-living entities like items)
-            if (!entity.aW()) {
-                // Check if the entity is not dead before processing
-                if (!entity.dead) {
-                    // Calculate the distance between the entity and the explosion in X, Y, and Z dimensions
-                    double d8 = entity.locX - this.posX;  // X-axis distance
-                    double d9 = entity.locY + entity.getHeadHeight() - this.posY;  // Y-axis distance (accounts for head height)
-                    double d10 = entity.locZ - this.posZ;  // Z-axis distance
+    public void affectEntities(List<Entity> entities, Vec3D explosionPos, float explosionRadius) {
+        // Precompute explosion radius squared to avoid multiple divisions.
+        double explosionRadiusSquared = explosionRadius * explosionRadius;
 
-                    // Calculate the squared distance to avoid unnecessary square root operations for comparison
-                    double distanceSquared = d8 * d8 + d9 * d9 + d10 * d10;
+        // Iterate over each entity in the list.
+        for (Entity entity : entities) {
+            // Skip non-interactive or dead entities early to save processing.
+            if (entity.aW() || entity.dead) continue;
 
-                    // Check if the entity is within a certain range of the explosion (64.0D = 8 block radius) and ensure it's not exactly at the explosion center
-                    if (distanceSquared <= 64.0D && distanceSquared != 0.0D) {
-                        // Calculate the actual distance to the entity by taking the square root of the squared distance
-                        double d11 = MathHelper.sqrt(distanceSquared);
+            // Calculate the distance between the entity and the explosion in a single step.
+            double dX = entity.locX - this.posX;
+            double dY = entity.locY + entity.getHeadHeight() - this.posY;
+            double dZ = entity.locZ - this.posZ;
+            double distanceSquared = dX * dX + dY * dY + dZ * dZ;
 
-                        // Normalize the distance by dividing it by the explosion radius (f3)
-                        double d7 = d11 / (double) f3;
+            // Skip entities outside the explosion radius (8 blocks or 64.0 units squared).
+            if (distanceSquared > 64.0 || distanceSquared == 0.0) continue;
 
-                        // Normalize the direction vectors by dividing by the distance (d11)
-                        d8 /= d11;  // X direction
-                        d9 /= d11;  // Y direction
-                        d10 /= d11;  // Z direction
+            // Precompute the actual distance and normalize the direction vectors.
+            double distance = MathHelper.sqrt(distanceSquared);
+            double normalizedDistance = distance / explosionRadius;
+            double invDistance = 1.0 / distance; // Inverse to avoid repetitive division.
 
-                        // Paper optimization - Asynchronously calculate the block density (how much the explosion is shielded by blocks)
-                        double finalD = d8 * 1.15;  // Store normalized X direction for later use
-                        double finalD1 = d9 * 1.15;  // Store normalized Y direction for later use
-                        double finalD11 = d10 * 1.15;  // Store normalized Z direction for later use
+            dX *= invDistance;
+            dY *= invDistance;
+            dZ *= invDistance;
 
-                        // Calculate block density around the entity's bounding box and handle it asynchronously
-                        this.getBlockDensity(vec3d, entity.getBoundingBox()).thenAccept((d12) -> MCUtils.ensureMain(() -> {
-                            // d12 represents the amount of explosion force reaching the entity (0.0 = fully blocked, 1.0 = full force)
+            // Paper optimization: Calculate the block density asynchronously.
+            final double scaledDX = dX * 1.15;
+            final double scaledDY = dY * 1.15;
+            final double scaledDZ = dZ * 1.15;
 
-                            // Calculate the explosion impact factor, scaled by the block density and distance from the explosion
-                            double d13 = (1.0D - d7) * d12;
+            // Start block density calculation.
+            this.getBlockDensity(explosionPos, entity.getBoundingBox()).thenAccept((blockDensity) -> {
+                // Switch to main thread for entity updates.
+                MCUtils.ensureMain(() -> {
+                    // Apply the explosion impact based on distance and block density.
+                    double explosionImpact = (1.0 - normalizedDistance) * blockDensity;
 
-                            // Special handling for cannoning entities to apply custom knockback (IonSpigot optimization)
-                            if (entity.isCannoningEntity) {
-                                entity.g(finalD * d13, finalD1 * d13, finalD11 * d13);  // Apply explosion force directly to cannoning entity
-                                return;  // Skip further processing for cannoning entities
-                            }
-
-                            // CraftBukkit start - Damage handling for the entity due to the explosion
-                            // Calculate the damage to the entity based on distance and force of the explosion
-                            CraftEventFactory.entityDamage = source;
-                            entity.forceExplosionKnockback = false;
-
-                            // Apply explosion damage to the entity
-                            boolean wasDamaged = entity.damageEntity(DamageSource.explosion(this), (float) ((int) ((d13 * d13 + d13) / 2.0D * 8.0D * (double) f3 + 1.0D)));
-
-                            // Reset damage source after calculation
-                            CraftEventFactory.entityDamage = null;
-
-                            // If the entity was not damaged, skip further processing (unless it's a TNT or falling block entity or has forced knockback)
-                            if (!wasDamaged && !(entity instanceof EntityTNTPrimed || entity instanceof EntityFallingBlock) && !entity.forceExplosionKnockback) {
-                                return;
-                            }
-
-                            // CraftBukkit end
-
-                            // Calculate the amount of knockback, applying enchantment protection if applicable (PaperSpigot)
-                            double d14 = entity instanceof EntityHuman && world.paperSpigotConfig.disableExplosionKnockback ? 0 : EnchantmentProtection.a(entity, d13);
-
-                            // PaperSpigot start - Apply explosion knockback to the entity, updating client velocity instantly
-                            entity.g(finalD * d14, finalD1 * d14, finalD11 * d14);
-
-                            // PaperSpigot end - Fix cannons by updating entity velocities
-
-                            // Handle knockback specifically for human entities that are not invulnerable and if knockback is not disabled
-                            if (entity instanceof EntityHuman && !((EntityHuman) entity).abilities.isInvulnerable && !world.paperSpigotConfig.disableExplosionKnockback) {
-                                // Store the knockback vector for the player
-                                this.k.put((EntityHuman) entity, new Vec3D(finalD * d13, finalD1 * d13, finalD11 * d13));
-                            }
-                        }));
+                    // Special case: Cannoning entities get custom knockback.
+                    if (entity.isCannoningEntity) {
+                        entity.g(scaledDX * explosionImpact, scaledDY * explosionImpact, scaledDZ * explosionImpact);
+                        return;
                     }
-                }
-            }
+
+                    // Damage handling: Calculate damage based on the explosion impact.
+                    CraftEventFactory.entityDamage = source;
+                    entity.forceExplosionKnockback = false;
+
+                    // Calculate damage (precompute as integer to save casting).
+                    int calculatedDamage = (int) ((explosionImpact * explosionImpact + explosionImpact) / 2.0 * 8.0 * explosionRadius + 1.0);
+                    boolean wasDamaged = entity.damageEntity(DamageSource.explosion(this), (float) calculatedDamage);
+
+                    // Reset the damage source.
+                    CraftEventFactory.entityDamage = null;
+
+                    // Skip further processing for entities that weren't damaged, except specific cases.
+                    if (!wasDamaged && !(entity instanceof EntityTNTPrimed || entity instanceof EntityFallingBlock) && !entity.forceExplosionKnockback) {
+                        return;
+                    }
+
+                    // Apply knockback with enchantment protection considered (PaperSpigot optimization).
+                    double knockbackFactor = entity instanceof EntityHuman && world.paperSpigotConfig.disableExplosionKnockback ? 0 : EnchantmentProtection.a(entity, explosionImpact);
+                    entity.g(scaledDX * knockbackFactor, scaledDY * knockbackFactor, scaledDZ * knockbackFactor);
+
+                    // Handle knockback for human players (non-invulnerable).
+                    if (entity instanceof EntityHuman && !((EntityHuman) entity).abilities.isInvulnerable && !world.paperSpigotConfig.disableExplosionKnockback) {
+                        // Store the knockback vector.
+                        this.k.put((EntityHuman) entity, new Vec3D(scaledDX * explosionImpact, scaledDY * explosionImpact, scaledDZ * explosionImpact));
+                    }
+                });
+            });
         }
     }
 
