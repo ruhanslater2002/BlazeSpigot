@@ -233,6 +233,7 @@ public class Main {
                 }
                 // Spigot End
                 Nacho.LOGGER.info("Loading libraries, please wait...");
+                dev.ruhan.blazespigot.BlazeConfig.init((File) options.valueOf("blaze-settings")); // BlazeSpigot
                 net.techcable.tacospigot.TacoSpigotConfig.init((File) options.valueOf("taco-settings")); // TacoSpigot - load config before we load libraries to allow access while loading
                 MinecraftServer.main(options);
             } catch (Throwable t) {

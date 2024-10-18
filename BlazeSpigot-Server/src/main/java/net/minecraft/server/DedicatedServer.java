@@ -176,9 +176,6 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
             if (this.getPort() < 0) { // Nacho - deobfuscate getPort
                 this.setPort(this.propertyManager.getInt("server-port", 25565));
             }
-            // BlazeSpigot start
-            BlazeConfig.init((File) options.valueOf("blaze-settings"));
-            // BlazeSpigot end
             // Nacho start
             KnockbackConfig.init((File) options.valueOf("knockback-settings"));
             this.setPlayerList(new DedicatedPlayerList(this)); // Nacho - deobfuscate setPlayerList

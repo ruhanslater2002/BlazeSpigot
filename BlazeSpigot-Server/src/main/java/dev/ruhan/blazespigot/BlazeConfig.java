@@ -37,7 +37,7 @@ public class BlazeConfig {
         CONFIG_FILE = configFile;
         config = new YamlConfiguration();
         try {
-            BlazeConfig.LOGGER.info("Loading BlazeSpigot config from " + configFile.getName());
+            BlazeConfig.LOGGER.info("Loading BlazeSpigot config from " + CONFIG_FILE.getName());
             config.load(CONFIG_FILE);
         } catch (IOException ignored) {
         } catch (InvalidConfigurationException ex) {

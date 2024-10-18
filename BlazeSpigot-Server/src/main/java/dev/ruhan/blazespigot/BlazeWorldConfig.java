@@ -5,7 +5,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 
 
-
 public class BlazeWorldConfig {
 
     private final String worldName;
@@ -22,7 +21,7 @@ public class BlazeWorldConfig {
         this.verbose = getBoolean( "verbose", true );
 
         log( "-------- World Settings For [" + worldName + "] --------" );
-        BlazeConfig.readConfig(BlazeConfig.class, this);
+        BlazeConfig.readConfig(BlazeWorldConfig.class, this);
     }
 
     private void set(String path, Object val) {

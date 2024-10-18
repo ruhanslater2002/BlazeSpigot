@@ -14,7 +14,7 @@ public class TacoSpigotWorldConfig {
     public TacoSpigotWorldConfig(String worldName) {
         this.worldName = worldName;
         this.config = TacoSpigotConfig.config;
-        init();
+        this.init();
     }
 
     public void init() {
