@@ -27,7 +27,7 @@ public class BlazeWorldConfig {
         this.verbose = getBoolean( "verbose", true );
 
         log( "-------- World Settings For [" + worldName + "] --------" );
-        BlazeConfig.readConfig(PaperWorldConfig.class, this);
+        BlazeConfig.readConfig(BlazeConfig.class, this);
     }
 
     private void set(String path, Object val) {
