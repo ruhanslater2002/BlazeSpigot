@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import dev.cobblesword.nachospigot.Nacho;
+import dev.ruhan.blazespigot.BlazeWorldConfig;
 import me.elier.nachospigot.config.NachoConfig;
 import me.elier.nachospigot.config.NachoWorldConfig;
 import me.suicidalkids.ion.movement.MovementCache;
@@ -178,6 +179,7 @@ public abstract class World implements IBlockAccess {
     public final co.aikar.timings.WorldTimingsHandler timings; // Spigot
     public final net.techcable.tacospigot.TacoSpigotWorldConfig tacoSpigotConfig; // TacoSpigot
     public final NachoWorldConfig nachoSpigotConfig; // NachoSpigot
+    public final BlazeWorldConfig blazeWorldConfig; // BlazeSpigot
 
     public CraftWorld getWorld() {
         return this.world;
@@ -196,6 +198,7 @@ public abstract class World implements IBlockAccess {
         this.paperSpigotConfig = new PaperWorldConfig( worlddata.getName() ); // PaperSpigot
         this.tacoSpigotConfig = new net.techcable.tacospigot.TacoSpigotWorldConfig(worlddata.getName()); // TacoSpigot
         this.nachoSpigotConfig = new NachoWorldConfig(worlddata.getName()); // NachoSpigot
+        this.blazeWorldConfig = new BlazeWorldConfig(worlddata.getName()); // BlazeSpigot
         this.generator = gen;
         this.world = new CraftWorld((WorldServer) this, gen, env);
         this.ticksPerAnimalSpawns = this.getServer().getTicksPerAnimalSpawns(); // CraftBukkit
