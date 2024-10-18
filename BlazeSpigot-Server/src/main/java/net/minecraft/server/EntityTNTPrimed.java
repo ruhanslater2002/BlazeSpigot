@@ -13,7 +13,7 @@ public class EntityTNTPrimed extends Entity {
     private EntityLiving source;
 
     // The explosion power (radius), set to 4 by default.
-    public float yield = 5; // CraftBukkit - added field
+    public float yield = 4; // CraftBukkit - added field
 
     // Determines whether the explosion will cause fire.
     public boolean isIncendiary = false; // CraftBukkit - added field
@@ -129,7 +129,7 @@ public class EntityTNTPrimed extends Entity {
         } else {
             // Update the entity (collision checks, etc.) and spawn smoke particles.
             this.W();
-            this.world.addParticle(EnumParticle.SMOKE_NORMAL, this.locX, this.locY + 0.5D, this.locZ, 0.0D, 0.0D, 0.0D, Constants.EMPTY_ARRAY);
+//            this.world.addParticle(EnumParticle.SMOKE_NORMAL, this.locX, this.locY + 0.5D, this.locZ, 0.0D, 0.0D, 0.0D, Constants.EMPTY_ARRAY);
         }
     }
 
