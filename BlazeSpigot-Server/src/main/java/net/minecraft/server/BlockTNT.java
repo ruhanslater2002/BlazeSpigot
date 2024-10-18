@@ -77,24 +77,45 @@ public class BlockTNT extends Block {
         this.a(world, blockposition, iblockdata, (EntityLiving) null); // Calls the method to prime the TNT.
     }
 
-    // Called to handle priming the TNT (e.g., lighting it on fire or breaking it).
+    // This method is called to handle priming the TNT (e.g., lighting it on fire or triggering it to explode).
     public void a(World world, BlockPosition blockposition, IBlockData iblockdata, EntityLiving entityliving) {
-        if (!world.isClientSide) { // Only on server side.
-            if (((Boolean) iblockdata.get(BlockTNT.EXPLODE)).booleanValue()) { // If the TNT is marked to explode.
+
+        // Ensure the logic is only executed on the server side (since TNT priming should be handled by the server).
+        if (!world.isClientSide) {
+
+            // Check if the TNT block is set to explode (i.e., its "explode" property is set to true).
+            // This is a state stored in the block's data (`iblockdata`).
+            if (((Boolean) iblockdata.get(BlockTNT.EXPLODE)).booleanValue()) {
+
+                // Create a location object (`org.bukkit.Location`) representing the position of the TNT block.
                 org.bukkit.Location loc = new org.bukkit.Location(world.getWorld(), blockposition.getX(), blockposition.getY(), blockposition.getZ());
 
-                // Adjust Y position for cannons (PaperSpigot fix).
+                // PaperSpigot fix: Adjust the Y position for TNT in cannons to make the explosion happen slightly above the block.
                 double y = blockposition.getY();
-                if (!world.paperSpigotConfig.fixCannons) y += 0.5;
+                if (!world.paperSpigotConfig.fixCannons) y += 0.5; // Raise the Y-coordinate if the cannon fix isn't enabled.
 
-                // Create a primed TNT entity and set its location and fuse time.
-                EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(loc, world, (double) ((float) blockposition.getX() + 0.5F), y, (double) ((float) blockposition.getZ() + 0.5F), entityliving);
+                // Create a new `EntityTNTPrimed` (a primed TNT entity) at the specified location.
+                // The TNT will be positioned slightly above the center of the block (X and Z + 0.5F, with possible Y adjustment).
+                // The `entityliving` represents the entity responsible for triggering the TNT (e.g., a player or mob).
+                EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(
+                    loc,           // Location of the TNT.
+                    world,         // The world where the TNT is primed.
+                    (double) ((float) blockposition.getX() + 0.5F), // X-coordinate (centered on the block).
+                    y,             // Y-coordinate (adjusted for cannons if necessary).
+                    (double) ((float) blockposition.getZ() + 0.5F), // Z-coordinate (centered on the block).
+                    entityliving   // The entity responsible for triggering the TNT.
+                );
 
-                world.addEntity(entitytntprimed); // Add the primed TNT to the world.
-                world.makeSound(entitytntprimed, "game.tnt.primed", 1.0F, 1.0F); // Play a sound for priming TNT.
+                // Add the newly created primed TNT entity to the world, making it an active entity that will explode after its fuse runs out.
+                world.addEntity(entitytntprimed);
+
+                // Play the TNT priming sound at the location of the primed TNT entity.
+                // The sound has a volume of 1.0F and a pitch of 1.0F.
+                world.makeSound(entitytntprimed, "game.tnt.primed", 1.0F, 1.0F);
             }
         }
     }
+
 
     // Handles player interaction with the TNT block (e.g., lighting it with flint and steel).
     public boolean interact(World world, BlockPosition blockposition, IBlockData iblockdata, EntityHuman entityhuman, EnumDirection enumdirection, float f, float f1, float f2) {
