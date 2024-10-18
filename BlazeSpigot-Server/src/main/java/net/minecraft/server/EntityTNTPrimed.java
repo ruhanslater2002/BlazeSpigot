@@ -40,11 +40,20 @@ public class EntityTNTPrimed extends Entity {
         this(loc, world); // Calls the constructor with location and world.
         this.setPosition(d0, d1, d2); // Set TNT position (coordinates).
 
-        // Randomize the motion of the TNT for realism.
-        float f = (float) (Math.random() * Math.PI * 2.0D); // Random angle in radians.
-        this.motX = (double) (-Math.sin(f) * 0.02F); // Random X motion.
+        // Randomize the motion of the TNT for realism. BlazeSpigot - Commented out
+        // PaperSpigot - Fix cannons by disabling motion along X and Z axes.
+        // BlazeSpigot
+        if (world.paperSpigotConfig.fixCannons) {
+            this.motX = this.motZ = 0.0F;
+        }
+        else {
+            float f = (float) (Math.random() * Math.PI * 2.0D); // Random angle in radians.
+            this.motX = (double) (-Math.sin(f) * 0.02F); // Random X motion.
+            this.motZ = (double) (-Math.cos(f) * 0.02F); // Random Z motion.
+        }
+
         this.motY = 0.20000000298023224D; // Initial upward motion.
-        this.motZ = (double) (-Math.cos(f) * 0.02F); // Random Z motion.
+        // BlazeSpigot
 
         // Set the default fuse time to 80 ticks (~4 seconds).
         this.fuseTicks = 80;
@@ -54,9 +63,6 @@ public class EntityTNTPrimed extends Entity {
         this.lastY = d1;
         this.lastZ = d2;
         this.source = entityliving;
-
-        // PaperSpigot - Fix cannons by disabling motion along X and Z axes.
-        if (world.paperSpigotConfig.fixCannons) this.motX = this.motZ = 0.0F;
     }
 
     // Initializes the entity's data. Empty because TNT doesn't need specific attributes.
