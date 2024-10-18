@@ -100,7 +100,7 @@ public class BlockTNT extends Block {
                 EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(
                     loc,           // Location of the TNT.
                     world,         // The world where the TNT is primed.
-                    (double) ((float) blockposition.getX() + 0.5F), // X-coordinate (centered on the block).
+                    (double) ((float) blockposition.getX() + 0.5F), // X-coordinate (centered on the block`).
                     y,             // Y-coordinate (adjusted for cannons if necessary).
                     (double) ((float) blockposition.getZ() + 0.5F), // Z-coordinate (centered on the block).
                     entityliving   // The entity responsible for triggering the TNT.

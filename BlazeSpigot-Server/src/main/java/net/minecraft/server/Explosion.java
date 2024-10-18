@@ -234,9 +234,9 @@ boolean flag1: This could represent whether the explosion should destroy blocks 
                         d10 /= d11;  // Z direction
 
                         // Paper optimization - Asynchronously calculate the block density (how much the explosion is shielded by blocks)
-                        double finalD = d8;  // Store normalized X direction for later use
-                        double finalD1 = d9;  // Store normalized Y direction for later use
-                        double finalD11 = d10;  // Store normalized Z direction for later use
+                        double finalD = d8 * 1.2;  // Store normalized X direction for later use
+                        double finalD1 = d9 * 1.2;  // Store normalized Y direction for later use
+                        double finalD11 = d10 * 1.2;  // Store normalized Z direction for later use
 
                         // Calculate block density around the entity's bounding box and handle it asynchronously
                         this.getBlockDensity(vec3d, entity.getBoundingBox()).thenAccept((d12) -> MCUtils.ensureMain(() -> {
