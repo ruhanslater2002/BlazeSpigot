@@ -286,7 +286,7 @@ public class PaperWorldConfig
 
             // Migrate world setting
 
-            value = config.getBoolean( "world-settings." + worldName + ".fix-cannons", false );
+            value = config.getBoolean( "world-settings." + worldName + ".fix-cannons", true );
             if ( !value ) value = config.getBoolean( "world-settings." + worldName + ".tnt-gameplay.fix-directional-bias", false );
             if ( !value ) value = !config.getBoolean( "world-settings." + worldName + ".tnt-gameplay.moves-in-water", true );
             if ( !value ) value = config.getBoolean( "world-settings." + worldName + ".tnt-gameplay.legacy-explosion-height", false );
