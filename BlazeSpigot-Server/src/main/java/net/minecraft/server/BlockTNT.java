@@ -31,24 +31,46 @@ public class BlockTNT extends Block {
         }
     }
 
-    // Called when the TNT block is exploded (e.g., by other explosions).
+    // This method is called when the TNT block is destroyed by another explosion.
     public void wasExploded(World world, BlockPosition blockposition, Explosion explosion) {
-        if (!world.isClientSide) { // Only execute on the server side.
-            // Get the source location of the explosion.
-            org.bukkit.Location loc = explosion.source instanceof EntityTNTPrimed ? ((EntityTNTPrimed) explosion.source).sourceLoc : new org.bukkit.Location(world.getWorld(), blockposition.getX(), blockposition.getY(), blockposition.getZ());
 
-            // Fix for cannons in PaperSpigot: Adjust the Y position of the explosion if configured.
-            double y = blockposition.getY();
+        // Check if the current world is not the client side (meaning this is server-side execution).
+        if (!world.isClientSide) {
+
+            // Determine the source location of the explosion. If the explosion's source is another primed TNT entity,
+            // use its source location. Otherwise, use the coordinates of the TNT block itself.
+            org.bukkit.Location loc = explosion.source instanceof EntityTNTPrimed
+                ? ((EntityTNTPrimed) explosion.source).sourceLoc  // Get the source location from the primed TNT.
+                : new org.bukkit.Location(world.getWorld(), blockposition.getX(), blockposition.getY(), blockposition.getZ()); // Use the block's coordinates as fallback.
+
+            // PaperSpigot: Fix cannon explosions. Adjust the Y-coordinate of the explosion's position if needed.
+            double y = blockposition.getY(); // Get the Y-coordinate of the block position.
+
+            // If the PaperSpigot configuration for cannon explosions is not enabled, increase the Y-coordinate by 0.5.
+            // This ensures that explosions happen slightly above the block for better realism.
             if (!world.paperSpigotConfig.fixCannons) y += 0.5;
 
-            // Create a new TNT entity (primed and ready to explode) at the given location.
-            EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(loc, world, (double) ((float) blockposition.getX() + 0.5F), y, (double) ((float) blockposition.getZ() + 0.5F), explosion.getSource());
+            // Create a new TNT entity (`EntityTNTPrimed`), which is a primed and ready-to-explode TNT block.
+            // The TNT is positioned slightly above the center of the block (x + 0.5F, z + 0.5F for centering and adjusted y-coordinate).
+            // The source of the explosion (player, mob, or other entity) is passed as the last argument.
+            EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(
+                loc,          // Location of the explosion.
+                world,        // The world where the explosion occurs.
+                (double) ((float) blockposition.getX() + 0.5F), // X-coordinate (centered on the block).
+                y,            // Adjusted Y-coordinate (may be raised depending on cannon fix config).
+                (double) ((float) blockposition.getZ() + 0.5F), // Z-coordinate (centered on the block).
+                explosion.getSource() // The source of the explosion (could be another entity or cause).
+            );
 
-            // Set the fuse time for the TNT entity.
+            // Set the fuse time (how long the TNT takes to explode after being primed).
+            // This fuse is randomized slightly, with a value between 1/8 and 1/4 of its total fuse time.
             entitytntprimed.fuseTicks = world.random.nextInt(entitytntprimed.fuseTicks / 4) + entitytntprimed.fuseTicks / 8;
-            world.addEntity(entitytntprimed); // Add the TNT entity to the world.
+
+            // Add the primed TNT entity to the world, making it an active entity that will explode after its fuse runs out.
+            world.addEntity(entitytntprimed);
         }
     }
+
 
     // Helper method to trigger an explosion after the block is broken or primed.
     public void postBreak(World world, BlockPosition blockposition, IBlockData iblockdata) {
