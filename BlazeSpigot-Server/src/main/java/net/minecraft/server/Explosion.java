@@ -89,6 +89,7 @@ public class Explosion {
     public boolean wasCanceled = false; // CraftBukkit - add field
 
 
+    // Constructor
     public Explosion(World world, Entity entity, double d0, double d1, double d2, float f, boolean flag, boolean flag1) {
         // Assign the world in which the explosion occurs
         this.world = world;
