@@ -127,7 +127,7 @@ public class EntityFallingBlock extends Entity {
             }
 
             // Apply gravity to the falling block.
-            this.motY -= 0.03999999910593033D;
+            this.motY -= 0.0399999910593033D;
             this.move(this.motX, this.motY, this.motZ); // Move the block based on its motion vectors.
 
             // PaperSpigot start - Remove entities in unloaded chunks
