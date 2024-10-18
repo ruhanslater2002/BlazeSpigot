@@ -6,6 +6,9 @@ import net.minecraft.server.World;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.IOException;
+import java.util.logging.Level;
+
 public class BlazeWorldConfig {
 
     private final String worldName;
@@ -15,6 +18,7 @@ public class BlazeWorldConfig {
     public BlazeWorldConfig(String worldName) {
         this.worldName = worldName;
         this.config = BlazeConfig.config;
+        setExplosionSettings();
         this.init();
     }
 
@@ -43,18 +47,21 @@ public class BlazeWorldConfig {
 
     // Ion Spigot
     public boolean constantExplosions;
-    private void setConstantExplosions() {
-        this.constantExplosions = this.getBoolean("explosions.constant-radius", false);
-    }
-
     public boolean explosionProtectedRegions;
-    private void setExplosionProtectedRegions() {
-        explosionProtectedRegions = getBoolean("explosions.protected-regions", true);
-    }
-    // Ion Spigot
-
     public boolean optimizeExplosions;
-    private void setOptimizeExplosions() {
-        optimizeExplosions = getBoolean("explosions.optimizeExplosions", true);
+    private void setExplosionSettings() {
+        this.constantExplosions = this.getBoolean("explosions.constant-radius", false);
+        this.explosionProtectedRegions = this.getBoolean("explosions.protected-regions", true);
+        this.optimizeExplosions = this.getBoolean("explosions.optimizeExplosions", true);
     }
+
+    // Optionally, add a save method to persist config changes
+    public void saveConfig() {
+        try {
+            config.save(BlazeConfig.CONFIG_FILE);
+        } catch (IOException ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "Could not save BlazeWorldConfig", ex);
+        }
+    }
+
 }

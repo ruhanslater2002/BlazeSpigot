@@ -49,8 +49,8 @@ public class BlazeConfig {
             Bukkit.getLogger().log(Level.SEVERE, "Could not load blaze.yml, please correct your syntax errors", ex);
         }
 
-        config.options().copyDefaults(true);
         config.options().header("--- BlazeSpigot Config File ---\nThis is the default configuration.");
+        config.options().copyDefaults(true);
 
         version = getInt( "config-version", 1);
         set( "config-version", 1);
