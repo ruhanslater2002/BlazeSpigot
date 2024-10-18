@@ -90,6 +90,19 @@ public class Explosion {
 
 
     // Constructor
+    /*
+World world: This is the world or environment in which the explosion happens. It might be an instance of the game world or a specific section of it. The explosion will affect the world (by destroying blocks, damaging entities, etc.).
+
+Entity entity: This represents the entity that caused the explosion. It could be a player, a mob like a creeper, or a piece of TNT. Knowing which entity caused the explosion might be useful for tracking damage or applying game logic (like dropping items or assigning blame).
+
+double d0, d1, d2: These are the coordinates (x, y, z) of the explosion's center. These values determine where in the world the explosion originates.
+
+float f: This is likely the strength or power of the explosion, affecting how far-reaching its effects are. A higher value might indicate a bigger explosion, causing more destruction over a larger area.
+
+boolean flag: This might represent whether or not the explosion causes fire. For example, some explosions could ignite nearby blocks (like TNT), while others might just cause a blast without fire.
+
+boolean flag1: This could represent whether the explosion should destroy blocks in the world. Some explosions might only damage entities without affecting the environment, while others can break blocks and leave craters.
+     */
     public Explosion(World world, Entity entity, double d0, double d1, double d2, float f, boolean flag, boolean flag1) {
         // Assign the world in which the explosion occurs
         this.world = world;
