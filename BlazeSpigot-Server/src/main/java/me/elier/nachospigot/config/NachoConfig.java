@@ -62,9 +62,6 @@ public class NachoConfig {
         OldNachoConfig nachoJson = FileUtils.toObject(old_config, OldNachoConfig.class);
         if(nachoJson == null) {old_config.delete(); return;}
         set("settings.save-empty-scoreboard-teams", nachoJson.saveEmptyScoreboardTeams);
-        set("settings.commands.enable-version-command", nachoJson.enableVersionCommand);
-        set("settings.commands.enable-plugins-command", nachoJson.enablePluginsCommand);
-        set("settings.commands.enable-reload-command", nachoJson.enableReloadCommand);
         set("settings.fast-operators", nachoJson.useFastOperators);
         set("settings.stop-notify-bungee", nachoJson.stopNotifyBungee);
         set("settings.anti-malware", nachoJson.checkForMalware);
@@ -104,9 +101,6 @@ public class NachoConfig {
     static void loadComments() {
         c.addComment("config-version", "Configuration version, do NOT modify this!");
         c.addComment("settings.save-empty-scoreboard-teams", "Toggles whether or not the server should save empty scoreboard teams");
-        c.addComment("settings.commands.enable-version-command", "Toggles the /version command");
-        c.addComment("settings.commands.enable-plugins-command", "Toggles the /plugins command");
-        c.addComment("settings.commands.enable-reload-command", "Toggles the /reload command");
         c.addComment("settings.fast-operators", "Enables Fast Operators, which uses a faster method for managing operators");
         c.addComment("settings.stop-notify-bungee", "Disables the firewall check when running BungeeCord");
         c.addComment("settings.anti-malware", "Enables the built-in anti malware feature");
@@ -138,9 +132,9 @@ public class NachoConfig {
         c.addComment("settings.use-tcp-fastopen", "Enables the TCP_FASTOPEN socket option");
         c.addComment("settings.lag-compensated-potions", "Enables lag compensation throwing potions");
         c.addComment("settings.smooth-potting", "Make potion throwing smoother");
-        c.addComment("settings.commands.permissions.version", "Enables a required permission to use /version");
-        c.addComment("settings.commands.permissions.plugins", "Enables a required permission to use /plugins");
-        c.addComment("settings.commands.enable-help-command", "Toggles the /help command");
+//        c.addComment("settings.commands.permissions.version", "Enables a required permission to use /version");
+//        c.addComment("settings.commands.permissions.plugins", "Enables a required permission to use /plugins");
+//        c.addComment("settings.commands.enable-help-command", "Toggles the /help command");
         c.addComment("settings.use-improved-hitreg", "Enables the usage of an improved hitreg based on lag compensation and small other details.");
         c.addComment("settings.disable-disconnect-spam", "Disables that players can be kicked because of disconnect.spam.");
         NachoWorldConfig.loadComments();
@@ -209,21 +203,7 @@ public class NachoConfig {
     private static void saveEmptyScoreboardTeams() {
         saveEmptyScoreboardTeams = getBoolean("settings.save-empty-scoreboard-teams", false);
     }
-    public static boolean enableVersionCommand;
-    public static boolean enableVersionPermission;
-    public static boolean enablePluginsCommand;
-    public static boolean enablePluginsPermission;
-    public static boolean enableReloadCommand;
-    public static boolean enableHelpCommand;
 
-    private static void commands() {
-        enableVersionCommand = getBoolean("settings.commands.enable-version-command", true);
-        enableVersionPermission = getBoolean("settings.commands.permission.version", true);
-        enablePluginsCommand = getBoolean("settings.commands.enable-plugins-command", true);
-        enablePluginsPermission = getBoolean("settings.commands.permission.plugins", true);
-        enableReloadCommand = getBoolean("settings.commands.enable-reload-command", true);
-        enableHelpCommand = getBoolean("settings.commands.enable-help-command", true);
-    }
 
     public static boolean useFastOperators;
 

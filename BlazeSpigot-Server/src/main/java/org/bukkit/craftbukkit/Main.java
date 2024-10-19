@@ -152,6 +152,13 @@ public class Main {
                         .defaultsTo(new File("taco.yml"))
                         .describedAs("Yml file");
                 // TacoSpigot end
+                // BlazeSpigot start
+                acceptsAll(asList("blaze", "blaze-settings"), "File for blazespigot settings")
+                        .withRequiredArg()
+                        .ofType(File.class)
+                        .defaultsTo(new File("blaze.yml"))
+                        .describedAs("Yml file");
+                // BlazeSpigot end
                 // NachoSpigot start
                 acceptsAll(asList("nacho", "nacho-settings"), "File for nachospigot settings")
                         .withRequiredArg()
@@ -232,6 +239,7 @@ public class Main {
                     Nacho.LOGGER.warn( "Please see http://www.spigotmc.org/wiki/changing-permgen-size/ for more details and more in-depth instructions." );
                 }
                 // Spigot End
+                blazeSpigotBanner();
                 Nacho.LOGGER.info("Loading libraries, please wait...");
                 dev.ruhan.blazespigot.BlazeConfig.init((File) options.valueOf("blaze-settings")); // BlazeSpigot
                 net.techcable.tacospigot.TacoSpigotConfig.init((File) options.valueOf("taco-settings")); // TacoSpigot - load config before we load libraries to allow access while loading
@@ -241,6 +249,30 @@ public class Main {
             }
         }
     }
+
+    private static void blazeSpigotBanner() {
+        final String RED = "\u001B[1;31m";
+        final String RESET = "\u001B[0m"; // Reset to default color
+
+        System.out.println(
+                RED +
+                "\n" +
+                "\n" +
+                "   ____  _                _____       _             _\n" +
+                "  |  _ \\| |              / ____|     (_)           | |\n" +
+                "  | |_) | | __ _ _______| (___  _ __  _  __ _  ___ | |_ \n" +
+                "  |  _ <| |/ _` |_  / _ \\___ \\| '_ \\| |/ _` |/ _ \\| __|\n" +
+                "  | |_) | | (_| |/ /  __/____) | |_) | | (_| | (_) | |_ \n" +
+                "  |____/|_|\\__,_/___\\___|_____/| .__/|_|\\__, |\\___/ \\__|\n" +
+                "                               | |       __/ |\n" +
+                "                               |_|      |___/  \n" +
+                "\n" +
+                "                   Running BlazeSpigot                    \n" +
+                "\n" +
+                "\n" + RESET
+        );
+    }
+
 
     private static List<String> asList(String... params) {
         return Arrays.asList(params);

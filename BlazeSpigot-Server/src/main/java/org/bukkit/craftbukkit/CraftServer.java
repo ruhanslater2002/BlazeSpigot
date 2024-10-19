@@ -776,6 +776,7 @@ public final class CraftServer implements Server {
             world.paperSpigotConfig.init(); // PaperSpigot
             world.tacoSpigotConfig.init(); // TacoSpigot
             world.nachoSpigotConfig.init(); // NachoSpigot
+            world.blazeSpigotConfig.init(); // BlazeSpigot
         }
 
         pluginManager.clearPlugins();
@@ -1547,35 +1548,35 @@ public final class CraftServer implements Server {
         return console.console;
     }
 
-    // Nacho start
-    @Override
-    public boolean versionCommandEnabled() {
-        return NachoConfig.enableVersionCommand;
-    }
-
-    @Override
-    public boolean versionPermissionEnabled() {
-        return NachoConfig.enableVersionPermission;
-    }
-
-    @Override
-    public boolean reloadCommandEnabled() {
-        return NachoConfig.enableReloadCommand;
-    }
-
-    @Override
-    public boolean pluginsCommandEnabled() {
-        return NachoConfig.enablePluginsCommand;
-    }
-
-    @Override
-    public boolean pluginsPermissionEnabled() {
-        return NachoConfig.enablePluginsPermission;
-    }
-
-    @Override
-    public boolean helpCommandEnabled() {return NachoConfig.enableHelpCommand;}
-    // Nacho end
+//    // Nacho start
+//    @Override
+//    public boolean versionCommandEnabled() {
+//        return NachoConfig.enableVersionCommand;
+//    }
+//
+//    @Override
+//    public boolean versionPermissionEnabled() {
+//        return NachoConfig.enableVersionPermission;
+//    }
+//
+//    @Override
+//    public boolean reloadCommandEnabled() {
+//        return NachoConfig.enableReloadCommand;
+//    }
+//
+//    @Override
+//    public boolean pluginsCommandEnabled() {
+//        return NachoConfig.enablePluginsCommand;
+//    }
+//
+//    @Override
+//    public boolean pluginsPermissionEnabled() {
+//        return NachoConfig.enablePluginsPermission;
+//    }
+//
+//    @Override
+//    public boolean helpCommandEnabled() {return NachoConfig.enableHelpCommand;}
+//    // Nacho end
 
     public EntityMetadataStore getEntityMetadata() {
         return entityMetadata;
@@ -1915,7 +1916,7 @@ public final class CraftServer implements Server {
         // Nacho end
 
         @Override
-        public YamlConfiguration getBlazeSpigotConfig() { return dev.ruhan.blazespigot.BlazeConfig.config; }
+        public YamlConfiguration getBlazeSpigotConfig() { return dev.ruhan.blazespigot.BlazeConfig.config; } // BlazeSpigot
 
         @Override
         public void restart() {

@@ -61,7 +61,7 @@ public class Explosion {
 
         if (!this.world.tacoSpigotConfig.optimizeLiquidExplosions || !b.getMaterial().isLiquid()) { //TacoSpigot - skip calculating what blocks to blow up in water/lava
             boolean protection = false;
-            if (world.blazeWorldConfig.explosionProtectedRegions) {
+            if (world.blazeSpigotConfig.explosionProtectedRegions) {
                 Location location = new Location(world.getWorld(), posX, posY, posZ);
 
                 List<org.bukkit.block.Block> list = new java.util.ArrayList<>(1);
@@ -369,7 +369,7 @@ public class Explosion {
             double d1 = vector[1];
             double d2 = vector[2];
 
-            float f = this.size * (0.7F + (world.blazeWorldConfig.constantExplosions ? 0.7F : this.world.random.nextFloat()) * 0.6F);
+            float f = this.size * (0.7F + (world.blazeSpigotConfig.constantExplosions ? 0.7F : this.world.random.nextFloat()) * 0.6F);
             float resistance = 0;
 
             double stepX = this.posX;
@@ -416,7 +416,7 @@ public class Explosion {
 
     // PaperSpigot, BlazeSpigot start - Optimize explosions
     private float getBlockDensity(Vec3D vec3d, AxisAlignedBB aabb) {
-        if (!this.world.blazeWorldConfig.optimizeExplosions) {
+        if (!this.world.blazeSpigotConfig.optimizeExplosions) {
             return this.world.a(vec3d, aabb);
         }
 

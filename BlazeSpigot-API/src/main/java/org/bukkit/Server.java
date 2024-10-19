@@ -707,56 +707,56 @@ public interface Server extends PluginMessageRecipient {
      */
     public ConsoleCommandSender getConsoleSender();
 
-    // Nacho start
-    /**
-     * Checks if /version is enabled.
-     * @return whether /version is enabled
-     */
-    default boolean versionCommandEnabled() {
-        return true;
-    }
-
-    /**
-     * Checks if /version requires a permission to use it.
-     * @return if /version needs a permission to use
-     */
-    default boolean versionPermissionEnabled() {
-        return false;
-    }
-
-    /**
-     * Checks if /reload is enabled.
-     * @return whether /reload is enabled
-     */
-    default boolean reloadCommandEnabled() {
-        return true;
-    }
-
-    /**
-     * Checks if /plugins is enabled.
-     * @return whether /plugins is enabled
-     */
-    default boolean pluginsCommandEnabled() {
-        return true;
-    }
-
-    /**
-     * Checks if /plugins requires a permission to use it.
-     * @return if /plugins needs a permission to use
-     */
-    default boolean pluginsPermissionEnabled() {
-        return false;
-    }
-
-    /**
-     * Checks if /help is enabled
-     * @return whether /help is enabled
-     */
-    default boolean helpCommandEnabled() {
-        return true;
-    }
-
-    // Nacho end
+//    // Nacho start
+//    /**
+//     * Checks if /version is enabled.
+//     * @return whether /version is enabled
+//     */
+//    default boolean versionCommandEnabled() {
+//        return true;
+//    }
+//
+//    /**
+//     * Checks if /version requires a permission to use it.
+//     * @return if /version needs a permission to use
+//     */
+//    default boolean versionPermissionEnabled() {
+//        return false;
+//    }
+//
+//    /**
+//     * Checks if /reload is enabled.
+//     * @return whether /reload is enabled
+//     */
+//    default boolean reloadCommandEnabled() {
+//        return true;
+//    }
+//
+//    /**
+//     * Checks if /plugins is enabled.
+//     * @return whether /plugins is enabled
+//     */
+//    default boolean pluginsCommandEnabled() {
+//        return true;
+//    }
+//
+//    /**
+//     * Checks if /plugins requires a permission to use it.
+//     * @return if /plugins needs a permission to use
+//     */
+//    default boolean pluginsPermissionEnabled() {
+//        return false;
+//    }
+//
+//    /**
+//     * Checks if /help is enabled
+//     * @return whether /help is enabled
+//     */
+//    default boolean helpCommandEnabled() {
+//        return true;
+//    }
+//
+//    // Nacho end
     /**
      * Gets the folder that contains all of the various {@link World}s.
      *

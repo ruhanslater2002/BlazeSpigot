@@ -54,18 +54,18 @@ public class TestServer implements InvocationHandler {
                     (server, args) -> "BukkitVersion_" + TestServer.class.getPackage().getImplementationVersion()
             );
             // Nacho start
-            methodMap.put(
-                    Server.class.getMethod("versionCommandEnabled"),
-                    (server, args) -> false
-            );
-            methodMap.put(
-                    Server.class.getMethod("reloadCommandEnabled"),
-                    (server, args) -> false
-            );
-            methodMap.put(
-                    Server.class.getMethod("pluginsCommandEnabled"),
-                    (server, args) -> false
-            );
+//            methodMap.put(
+//                    Server.class.getMethod("versionCommandEnabled"),
+//                    (server, args) -> false
+//            );
+//            methodMap.put(
+//                    Server.class.getMethod("reloadCommandEnabled"),
+//                    (server, args) -> false
+//            );
+//            methodMap.put(
+//                    Server.class.getMethod("pluginsCommandEnabled"),
+//                    (server, args) -> false
+//            );
             methodMap.put(
                     Server.class.getMethod("getCommandMap"),
                     new MethodHandler() {

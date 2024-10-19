@@ -12,7 +12,6 @@ import com.destroystokyo.paper.PaperConfig;
 import dev.cobblesword.nachospigot.Nacho;
 import dev.cobblesword.nachospigot.commons.IPUtils;
 import dev.cobblesword.nachospigot.knockback.KnockbackConfig;
-import dev.ruhan.blazespigot.BlazeConfig;
 import me.elier.nachospigot.config.NachoConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -180,7 +179,6 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
             KnockbackConfig.init((File) options.valueOf("knockback-settings"));
             this.setPlayerList(new DedicatedPlayerList(this)); // Nacho - deobfuscate setPlayerList
             Nacho.get().registerCommands(); // NachoSpigot :: Commands
-            NachoConfig.init((File) options.valueOf("nacho-settings")); // NachoSpigot - Load config before PlayerList
             // Spigot start
             org.spigotmc.SpigotConfig.init((File) options.valueOf("spigot-settings"));
             org.spigotmc.SpigotConfig.registerCommands();
@@ -189,6 +187,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
             PaperConfig.init((File) options.valueOf("paper-settings"));
             PaperConfig.registerCommands();
             // PaperSpigot end
+            NachoConfig.init((File) options.valueOf("nacho-settings")); // NachoSpigot - Load config before PlayerList
 
             DedicatedServer.LOGGER.info("Generating keypair");
             this.a(MinecraftEncryption.b());
